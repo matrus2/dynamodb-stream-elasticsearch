@@ -2,3 +2,7 @@
 
 # dynamodb-stream-elasticsearch
 Missing blueprint for AWS Lambda. Reads stream from AWS DynamoDB and writes it to AWS ElasticSearch.
+Compatible with node 6.10.
+
+
+#### in development....
