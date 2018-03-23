@@ -1,12 +1,16 @@
 const AWS = require('aws-sdk')
 const converter = AWS.DynamoDB.Converter.unmarshall
-const elastic = require('./esWrapper')
+const elastic = require('../utils/esWrapper')
+const {removeEventData} = require('./../utils/index')
 
-exports.pushStream = async ({event, index, type, id, body, endpoint, testMode = false} = {}) => {
-  // Data validation
-  if (!index || !(typeof index === 'string')) throw new Error('Please provide correct index')
-  if (!type || !(typeof type === 'string')) throw new Error('Please provide correct type')
-  if (!endpoint || !(typeof endpoint === 'string')) throw new Error('Please provide correct endpoint')
+const validateParam = (param, paramName) => {
+  if (!param || !(typeof param === 'string')) throw new Error(`Please provide correct ${paramName}`)
+}
+
+exports.pushStream = async ({event, index, type, endpoint, testMode = false} = {}) => {
+  validateParam(index, 'index')
+  validateParam(type, 'type')
+  validateParam(endpoint, 'endpoint')
 
   const es = elastic(endpoint, testMode)
 
@@ -16,7 +20,11 @@ exports.pushStream = async ({event, index, type, id, body, endpoint, testMode = 
 
         break
       case 'MODIFY':
-
+        const keys = converter(record.dynamodb.Keys)
+        const id = Object.values(keys).reduce((acc, curr) => acc.concat(curr), '')
+        let body = converter(record.dynamodb.NewImage)
+        body = removeEventData(body)
+        es.index({index, type, id, body})
         break
       case 'INSERT':
 
