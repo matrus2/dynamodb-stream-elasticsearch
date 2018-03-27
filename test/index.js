@@ -3,8 +3,8 @@ const {assert} = require('chai')
 const fetch = require('node-fetch')
 const AWS = require('aws-sdk')
 const {pushStream} = require('./../src/index')
-const elastic = require('../utils/esWrapper')
-const {sampleData, modifyEvent} = require('./fixtures')
+const elastic = require('../utils/es-wrapper')
+const {sampleData, modifyEvent, removeEvent} = require('./fixtures')
 const {removeEventData} = require('./../utils/index')
 
 const converter = AWS.DynamoDB.Converter.unmarshall
@@ -34,29 +34,40 @@ function resolveAfter1Second () {
 
 // 1. run a docker container
 // docker run -i -p 9200:9200 --name my_elastic -p 9300:9300 -e "discovery.type=single-node" elasticsearch
-describe('MODIFY event', () => {
+describe('Test stream events', () => {
   beforeEach(async () => {
     const promiseArray = sampleData.map(
-      data => es.index({index: INDEX, type: TYPE, id: data.url, body: data, refresh: true}))
+      data => es.index({index: INDEX, type: TYPE, id: data.url, body: data}))
     await Promise.all(promiseArray).catch(e => { console.log(e) })
   })
   afterEach(async () => {
     const promiseArray = sampleData.map(
-      data => es.remove({index: INDEX, type: TYPE, id: data.url, refresh: true}))
+      async data => await es.exists({index: INDEX, type: TYPE, id: data.url}) ? es.remove({
+        index: INDEX,
+        type: TYPE,
+        id: data.url
+      }) : Promise.resolve())
     await Promise.all(promiseArray)
   })
 
-  it('should modify existing item', async () => {
+  it('MODIFY: should modify existing item', async () => {
     await pushStream({event: modifyEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
     await resolveAfter1Second() // give time for elasticsearch to refresh index
     const keys = converter(modifyEvent.Records[0].dynamodb.Keys)
     const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
     const body = await result.json()
-
     const data = removeEventData(converter(modifyEvent.Records[0].dynamodb.NewImage))
     assert.deepEqual(data, body._source)
   })
-  it('wrong input index is not a string', async () => {
+  it('REMOVE: should modify existing item', async () => {
+    await pushStream({event: removeEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
+    await resolveAfter1Second() // give time for elasticsearch to refresh index
+    const keys = converter(removeEvent.Records[0].dynamodb.Keys)
+    const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
+    const body = await result.json()
+    assert.isFalse(body.found)
+  })
+  it('Input data: wrong index is not a string', async () => {
     const simpleData = {
       index: 12,
       type: 'test1',
@@ -67,7 +78,7 @@ describe('MODIFY event', () => {
     }
     await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct index')
   })
-  it('wrong input type is not a string', async () => {
+  it('Input data: wrong type is not a string', async () => {
     const simpleData = {
       index: 'asd',
       type: '',
@@ -78,7 +89,7 @@ describe('MODIFY event', () => {
     }
     await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct type')
   })
-  it('wrong input endpoint is not a string', async () => {
+  it('Input data: wrong endpoint is not a string', async () => {
     const simpleData = {
       index: '12',
       type: 'test1',

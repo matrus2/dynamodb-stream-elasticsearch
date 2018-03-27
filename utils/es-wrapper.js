@@ -19,6 +19,12 @@ module.exports = (hosts, testMode) => {
         if (error) reject(error)
         resolve(response)
       })
+    }),
+    exists: ({index, type, id}) => new Promise((resolve, reject) => {
+      es.exists({index, type, id, refresh: true}, (error, response) => {
+        if (error) reject(error)
+        resolve(response)
+      })
     })
   }
 }

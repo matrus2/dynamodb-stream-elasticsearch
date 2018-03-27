@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk')
 const converter = AWS.DynamoDB.Converter.unmarshall
-const elastic = require('../utils/esWrapper')
+const elastic = require('../utils/es-wrapper')
 const {removeEventData} = require('./../utils/index')
 
 const validateParam = (param, paramName) => {
@@ -15,13 +15,14 @@ exports.pushStream = async ({event, index, type, endpoint, testMode = false} = {
   const es = elastic(endpoint, testMode)
 
   event.Records.forEach((record) => {
+    const keys = converter(record.dynamodb.Keys)
+    const id = Object.values(keys).reduce((acc, curr) => acc.concat(curr), '')
+
     switch (record.eventName) {
       case 'REMOVE':
-
+        es.remove({index, type, id})
         break
       case 'MODIFY':
-        const keys = converter(record.dynamodb.Keys)
-        const id = Object.values(keys).reduce((acc, curr) => acc.concat(curr), '')
         let body = converter(record.dynamodb.NewImage)
         body = removeEventData(body)
         es.index({index, type, id, body})
