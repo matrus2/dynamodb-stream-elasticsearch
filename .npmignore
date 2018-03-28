@@ -1,2 +1,6 @@
 src
 test
+utils
+.babelrc
+.eslintrc
+.gitignore
