@@ -20,18 +20,26 @@ exports.pushStream = async ({event, index, type, endpoint, testMode = false} = {
 
     switch (record.eventName) {
       case 'REMOVE': {
-        await es.remove({index, type, id})
+        try {
+          await es.remove({index, type, id})
+        } catch (e) {
+          throw new Error(e)
+        }
         break
       }
       case 'MODIFY':
       case 'INSERT': {
         let body = converter(record.dynamodb.NewImage)
         body = removeEventData(body)
-        await es.index({index, type, id, body})
+        try {
+          await es.index({index, type, id, body})
+        } catch (e) {
+          throw new Error(e)
+        }
         break
       }
       default:
-        console.log(record.eventName + ' wasn\'t recognized')
+        throw new Error(record.eventName + ' wasn\'t recognized')
     }
   })
 }
