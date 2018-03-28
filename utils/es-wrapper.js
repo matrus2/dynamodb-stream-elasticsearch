@@ -25,6 +25,12 @@ module.exports = (hosts, testMode) => {
         if (error) reject(error)
         resolve(response)
       })
+    }),
+    indicesDelete: (index = '_all') => new Promise((resolve, reject) => {
+      es.indices.delete({index}, (error, response) => {
+        if (error) reject(error)
+        resolve(response)
+      })
     })
   }
 }

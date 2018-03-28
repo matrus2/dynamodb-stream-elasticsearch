@@ -14,22 +14,24 @@ exports.pushStream = async ({event, index, type, endpoint, testMode = false} = {
 
   const es = elastic(endpoint, testMode)
 
-  event.Records.forEach((record) => {
+  event.Records.forEach(async (record) => {
     const keys = converter(record.dynamodb.Keys)
     const id = Object.values(keys).reduce((acc, curr) => acc.concat(curr), '')
 
     switch (record.eventName) {
-      case 'REMOVE':
-        es.remove({index, type, id})
+      case 'REMOVE': {
+        await es.remove({index, type, id})
         break
+      }
       case 'MODIFY':
+      case 'INSERT': {
         let body = converter(record.dynamodb.NewImage)
         body = removeEventData(body)
-        es.index({index, type, id, body})
+        await es.index({index, type, id, body})
         break
-      case 'INSERT':
-
-        break
+      }
+      default:
+        console.log(record.eventName + ' wasn\'t recognized')
     }
   })
 }

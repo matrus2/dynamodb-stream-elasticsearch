@@ -4,7 +4,7 @@ const fetch = require('node-fetch')
 const AWS = require('aws-sdk')
 const {pushStream} = require('./../src/index')
 const elastic = require('../utils/es-wrapper')
-const {sampleData, modifyEvent, removeEvent} = require('./fixtures')
+const {sampleData, modifyEvent, removeEvent, insertEvent, multipleEvents} = require('./fixtures')
 const {removeEventData} = require('./../utils/index')
 
 const converter = AWS.DynamoDB.Converter.unmarshall
@@ -41,15 +41,8 @@ describe('Test stream events', () => {
     await Promise.all(promiseArray).catch(e => { console.log(e) })
   })
   afterEach(async () => {
-    const promiseArray = sampleData.map(
-      async data => await es.exists({index: INDEX, type: TYPE, id: data.url}) ? es.remove({
-        index: INDEX,
-        type: TYPE,
-        id: data.url
-      }) : Promise.resolve())
-    await Promise.all(promiseArray)
+    await es.indicesDelete()
   })
-
   it('MODIFY: should modify existing item', async () => {
     await pushStream({event: modifyEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
     await resolveAfter1Second() // give time for elasticsearch to refresh index
@@ -59,7 +52,7 @@ describe('Test stream events', () => {
     const data = removeEventData(converter(modifyEvent.Records[0].dynamodb.NewImage))
     assert.deepEqual(data, body._source)
   })
-  it('REMOVE: should modify existing item', async () => {
+  it('REMOVE: should delete existing item', async () => {
     await pushStream({event: removeEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
     await resolveAfter1Second() // give time for elasticsearch to refresh index
     const keys = converter(removeEvent.Records[0].dynamodb.Keys)
@@ -67,6 +60,38 @@ describe('Test stream events', () => {
     const body = await result.json()
     assert.isFalse(body.found)
   })
+  it('INSERT: should insert new item', async () => {
+    await pushStream({event: insertEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
+    await resolveAfter1Second() // give time for elasticsearch to refresh index
+    const keys = converter(insertEvent.Records[0].dynamodb.Keys)
+    const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
+    const body = await result.json()
+    assert.isTrue(body.found)
+    const data = removeEventData(converter(insertEvent.Records[0].dynamodb.NewImage))
+    assert.deepEqual(data, body._source)
+  })
+  it('Multiple events: insert, remove, modify', async () => {
+    await pushStream({event: multipleEvents, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
+    await resolveAfter1Second() // give time for elasticsearch to refresh index
+    await resolveAfter1Second() // give time for elasticsearch to refresh index
+    const removed = converter(multipleEvents.Records[2].dynamodb.Keys).url
+    const inserted = converter(multipleEvents.Records[0].dynamodb.Keys).url
+    const changed = converter(multipleEvents.Records[1].dynamodb.Keys).url
+    // REMOVED
+    let result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${removed}`)
+    let body = await result.json()
+    assert.isFalse(body.found)
+    // INSERTED
+    result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`)
+    body = await result.json()
+    assert.isTrue(body.found)
+    // CHANGED
+    result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${changed}`)
+    body = await result.json()
+    const data = removeEventData(converter(multipleEvents.Records[1].dynamodb.NewImage))
+    assert.deepEqual(data, body._source)
+  })
+
   it('Input data: wrong index is not a string', async () => {
     const simpleData = {
       index: 12,
