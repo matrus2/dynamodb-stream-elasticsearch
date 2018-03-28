@@ -3,9 +3,9 @@ const {assert} = require('chai')
 const fetch = require('node-fetch')
 const AWS = require('aws-sdk')
 const {pushStream} = require('./../src/index')
-const elastic = require('../utils/es-wrapper')
+const elastic = require('../src/utils/es-wrapper')
 const {sampleData, modifyEvent, removeEvent, insertEvent, multipleEvents} = require('./fixtures')
-const {removeEventData} = require('./../utils/index')
+const {removeEventData} = require('../src/utils/index')
 
 const converter = AWS.DynamoDB.Converter.unmarshall
 const INDEX = 'test'

@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk')
 const converter = AWS.DynamoDB.Converter.unmarshall
-const elastic = require('../utils/es-wrapper')
-const {removeEventData} = require('./../utils/index')
+const elastic = require('./utils/es-wrapper')
+const {removeEventData} = require('./utils/index')
 
 const validateParam = (param, paramName) => {
   if (!param || !(typeof param === 'string')) throw new Error(`Please provide correct ${paramName}`)
