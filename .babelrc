@@ -1,11 +1,4 @@
 {
-  "presets": [
-    [
-      "env", {
-      "targets": {
-        "node": "6.10"
-      }
-    }
-    ]
-  ]
+  "plugins": ["transform-runtime"],
+  "presets": ["es2017", "es2015"]
 }
