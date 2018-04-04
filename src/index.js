@@ -21,7 +21,9 @@ exports.pushStream = async ({event, index, type, endpoint, testMode = false} = {
     switch (record.eventName) {
       case 'REMOVE': {
         try {
-          await es.remove({index, type, id})
+          if (await es.exists({index, type, id})) {
+            await es.remove({index, type, id})
+          }
         } catch (e) {
           throw new Error(e)
         }

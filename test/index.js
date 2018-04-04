@@ -60,6 +60,16 @@ describe('Test stream events', () => {
     const body = await result.json()
     assert.isFalse(body.found)
   })
+  it('REMOVE: should not delete if item doen\'t exists', async () => {
+    const event = removeEvent
+    event.Records[0].dynamodb.Keys.url.S = 'something-which-doesnt-exists'
+    await pushStream({event, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
+    await resolveAfter1Second() // give time for elasticsearch to refresh index
+    const keys = converter(removeEvent.Records[0].dynamodb.Keys)
+    const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
+    const body = await result.json()
+    assert.isFalse(body.found)
+  })
   it('INSERT: should insert new item', async () => {
     await pushStream({event: insertEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
     await resolveAfter1Second() // give time for elasticsearch to refresh index
