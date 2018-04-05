@@ -15,17 +15,19 @@
     "url": "git+https://github.com/matrus2/dynamodb-stream-elasticsearch.git"
   },
   "keywords": [
+    "AWS",
+    "Lambda",
+    "DynamoDB",
+    "Elasticsearch",
     "AWS Lambda",
     "AWS DynamoDB",
     "AWS Elasticsearch",
-    "Lambda",
     "Blueprint",
-    "Dynamo",
     "Stream",
     "Node"
   ],
   "author": "Bogusz Przybyslawski <biuro@matrus.pl>",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/matrus2/dynamodb-stream-elasticsearch/issues"
   },
