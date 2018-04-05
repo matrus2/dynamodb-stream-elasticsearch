@@ -18,7 +18,7 @@
 ```
 # DynamoDB --> Stream --> ElasticSearch
 
-The missing blueprint for AWS Lambda. Reads stream from AWS DynamoDB and writes it to AWS ElasticSearch.
+The missing blueprint for AWS Lambda, which reads stream from AWS DynamoDB and writes it to ElasticSearch.
 Compatible with node 6.10.
 
 Whenever data is changed (modified, removed or inserted) in DynamoDB one can use AWS Lambda function to capture this change and update ElasticSearch machine immediately. Further reading:
@@ -26,11 +26,11 @@ Whenever data is changed (modified, removed or inserted) in DynamoDB one can use
 [Indexing Amazon DynamoDB Content with Amazon Elasticsearch Service Using AWS Lambda](https://aws.amazon.com/blogs/compute/indexing-amazon-dynamodb-content-with-amazon-elasticsearch-service-using-aws-lambda/) 
 ## Getting Started
 
-Install:
+1. Install:
 ```javascript
 npm i dynamodb-stream-elasticsearch 
 ```
-Use it in your lambda:
+2. Use it in your lambda:
 ```javascript
 const { pushStream } = require('dynamodb-stream-elasticsearch');
 
@@ -49,7 +49,7 @@ function myHandler(event, context, callback) {
 
 exports.handler = myHandler;
 ```
-Upload Lambda to AWS and star this repository if it works as expected!!
+3. Upload Lambda to AWS and star this repository if it works as expected!!
 
 ### Parameters
 
@@ -69,9 +69,9 @@ To run tests locally you need to have ElasticSearch docker container. Simply typ
 docker run -i -p 9200:9200 --name my_elastic -p 9300:9300 -e "discovery.type=single-node" elasticsearch
 ```
 If you want to commit changes, make sure if follow these rules:
-1. All code changes should go with proper integration test;
+1. All code changes should go with a proper integration test;
 2. Code should follow [Javascript Standard Guideline](https://standardjs.com/);
-3. Commit message should be set according to [this article](https://chris.beams.io/posts/git-commit/).
+3. Commit messages should be set according to [this article](https://chris.beams.io/posts/git-commit/).
 
 
 ## Authors & Contributors
