@@ -2,13 +2,12 @@
   "name": "dynamodb-stream-elasticsearch",
   "version": "1.0.0",
   "description": "Missing blueprint for AWS Lambda. Reads stream from AWS DynamoDB and writes it to AWS ElasticSearch.",
-  "main": "dist/index.js",
+  "main": "src/index.js",
   "scripts": {
-    "transpile": "babel src -d dist",
     "test": "mocha test/index.js --timeout 6000",
-    "publish:patch": "npm run transpile && npm version patch && npm publish",
-    "publish:minor": "npm run transpile && npm version minor && npm publish",
-    "publish:major": "npm run transpile && npm version major && npm publish"
+    "publish:patch": "npm version patch && npm publish",
+    "publish:minor": "npm version minor && npm publish",
+    "publish:major": "npm version major && npm publish"
   },
   "repository": {
     "type": "git",
@@ -33,12 +32,6 @@
   },
   "homepage": "https://github.com/matrus2/dynamodb-stream-elasticsearch#readme",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-plugin-transform-es2017-object-entries": "0.0.4",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-es2017": "^6.24.1",
-    "babel-preset-stage-1": "^6.24.1",
     "chai": "^4.1.2",
     "eslint": "^4.19.0",
     "eslint-config-standard": "^11.0.0",
@@ -52,7 +45,6 @@
   },
   "dependencies": {
     "aws-sdk": "^2.211.1",
-    "babel-plugin-transform-runtime": "^6.23.0",
     "elasticsearch": "^14.2.1",
     "http-aws-es": "^4.0.0"
   }
