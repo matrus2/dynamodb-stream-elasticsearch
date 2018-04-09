@@ -19,7 +19,7 @@
 # DynamoDB --> Stream --> ElasticSearch
 
 The missing blueprint for AWS Lambda, which reads stream from AWS DynamoDB and writes it to ElasticSearch.
-Compatible with node 6.10.
+Compatible with node 8.10. (If for some reason you want to use it with node 6.10, then use 1.0.0 of this module)
 
 Whenever data is changed (modified, removed or inserted) in DynamoDB one can use AWS Lambda function to capture this change and update ElasticSearch machine immediately. Further reading:
 
