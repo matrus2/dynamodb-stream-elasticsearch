@@ -73,7 +73,7 @@ If you want to commit changes, make sure if follow these rules:
 2. Code should follow [Javascript Standard Guideline](https://standardjs.com/);
 3. Commit messages should be set according to [this article](https://chris.beams.io/posts/git-commit/).
 
-####TODO
+#### TODO
 - Introduce Continuous Integration;
 - Add elastic search bulk operation instead of index for multiple records; 
 
