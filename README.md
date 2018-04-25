@@ -26,11 +26,11 @@ Whenever data is changed (modified, removed or inserted) in DynamoDB one can use
 [Indexing Amazon DynamoDB Content with Amazon Elasticsearch Service Using AWS Lambda](https://aws.amazon.com/blogs/compute/indexing-amazon-dynamodb-content-with-amazon-elasticsearch-service-using-aws-lambda/) 
 ## Getting Started
 
-1. Install:
+Install:
 ```javascript
 npm i dynamodb-stream-elasticsearch 
 ```
-2. Use it in your lambda:
+Use it in your lambda:
 ```javascript
 const { pushStream } = require('dynamodb-stream-elasticsearch');
 
@@ -49,7 +49,7 @@ function myHandler(event, context, callback) {
 
 exports.handler = myHandler;
 ```
-3. Upload Lambda to AWS and star this repository if it works as expected!!
+Upload Lambda to AWS and _star_ this repository if it works as expected!!
 
 ### Parameters
 
@@ -73,6 +73,9 @@ If you want to commit changes, make sure if follow these rules:
 2. Code should follow [Javascript Standard Guideline](https://standardjs.com/);
 3. Commit messages should be set according to [this article](https://chris.beams.io/posts/git-commit/).
 
+####TODO
+- Introduce Continuous Integration;
+- Add elastic search bulk operation instead of index for multiple records; 
 
 ## Authors & Contributors
 
