@@ -8,20 +8,20 @@ module.exports = (hosts, testMode) => {
 
   const es = new elasticsearch.Client(esParams)
   return {
-    index: ({index, type, id, body}) => new Promise((resolve, reject) => {
-      es.index({index, type, id, body, refresh: true, timeout: '5m'}, (error, response) => {
+    index: ({index, type, id, body, refresh}) => new Promise((resolve, reject) => {
+      es.index({index, type, id, body, refresh, timeout: '5m'}, (error, response) => {
         if (error) reject(error)
         resolve(response)
       })
     }),
-    remove: ({index, type, id}) => new Promise((resolve, reject) => {
-      es.delete({index, type, id, refresh: true}, (error, response) => {
+    remove: ({index, type, id, refresh}) => new Promise((resolve, reject) => {
+      es.delete({index, type, id, refresh}, (error, response) => {
         if (error) reject(error)
         resolve(response)
       })
     }),
-    exists: ({index, type, id}) => new Promise((resolve, reject) => {
-      es.exists({index, type, id, refresh: true}, (error, response) => {
+    exists: ({index, type, id, refresh}) => new Promise((resolve, reject) => {
+      es.exists({index, type, id, refresh}, (error, response) => {
         if (error) reject(error)
         resolve(response)
       })
