@@ -28,8 +28,17 @@ exports.pushStream = async ({event, index, type, refresh = true, endpoint, testM
     switch (record.eventName) {
       case 'REMOVE': {
         try {
-          if (await es.exists({finalIndex, finalType, id, refresh})) {
-            await es.remove({finalIndex, finalType, id, refresh})
+          if (await es.exists({
+            index: finalIndex, 
+            type: finalType, 
+            id, refresh
+          })) {
+            await es.remove({
+              index: finalIndex, 
+              type: finalType, 
+              id, 
+              refresh
+            })
           }
         } catch (e) {
           throw new Error(e)
@@ -41,7 +50,13 @@ exports.pushStream = async ({event, index, type, refresh = true, endpoint, testM
         let body = converter(record.dynamodb.NewImage)
         body = removeEventData(body)
         try {
-          await es.index({finalIndex, finalType, id, body, refresh})
+          await es.index({
+            index: finalIndex, 
+            type: finalType, 
+            id, 
+            body, 
+            refresh
+          })
         } catch (e) {
           throw new Error(e)
         }
