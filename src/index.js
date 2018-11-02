@@ -1,16 +1,20 @@
 const AWS = require('aws-sdk')
 const converter = AWS.DynamoDB.Converter.unmarshall
 const elastic = require('./utils/es-wrapper')
-const {removeEventData} = require('./utils/index')
+const { removeEventData } = require('./utils/index')
 
-const validateParam = (param, paramName) => {
-  if (!param || !(typeof param === 'string')) throw new Error(`Please provide correct ${paramName}`)
+const validateString = (param, paramName) => {
+  if (!param || !(typeof param === 'string')) throw new Error(`Please provide correct value for ${paramName}`)
+}
+const validateBoolean = (param, paramName) => {
+  if (!(typeof param === 'boolean')) throw new Error(`Please provide correct value for ${paramName}`)
 }
 
-exports.pushStream = async ({event, index, type, endpoint, testMode = false} = {}) => {
-  validateParam(index, 'index')
-  validateParam(type, 'type')
-  validateParam(endpoint, 'endpoint')
+exports.pushStream = async ({ event, index, type, endpoint, refresh = true, testMode = false } = {}) => {
+  validateString(index, 'index')
+  validateString(type, 'type')
+  validateString(endpoint, 'endpoint')
+  validateBoolean(refresh, 'refresh')
 
   const es = elastic(endpoint, testMode)
 
@@ -21,8 +25,8 @@ exports.pushStream = async ({event, index, type, endpoint, testMode = false} = {
     switch (record.eventName) {
       case 'REMOVE': {
         try {
-          if (await es.exists({index, type, id})) {
-            await es.remove({index, type, id})
+          if (await es.exists({ index, type, id, refresh })) {
+            await es.remove({ index, type, id, refresh })
           }
         } catch (e) {
           throw new Error(e)
@@ -34,7 +38,7 @@ exports.pushStream = async ({event, index, type, endpoint, testMode = false} = {
         let body = converter(record.dynamodb.NewImage)
         body = removeEventData(body)
         try {
-          await es.index({index, type, id, body})
+          await es.index({ index, type, id, body, refresh })
         } catch (e) {
           throw new Error(e)
         }

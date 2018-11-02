@@ -1,11 +1,11 @@
 /* eslint-env mocha */
-const {assert} = require('chai')
+const { assert } = require('chai')
 const fetch = require('node-fetch')
 const AWS = require('aws-sdk')
-const {pushStream} = require('./../src/index')
+const { pushStream } = require('./../src/index')
 const elastic = require('../src/utils/es-wrapper')
-const {sampleData, modifyEvent, removeEvent, insertEvent, multipleEvents} = require('./fixtures')
-const {removeEventData} = require('../src/utils/index')
+const { sampleData, modifyEvent, removeEvent, insertEvent, multipleEvents } = require('./fixtures')
+const { removeEventData } = require('../src/utils/index')
 
 const converter = AWS.DynamoDB.Converter.unmarshall
 const INDEX = 'test'
@@ -37,14 +37,14 @@ function resolveAfter1Second () {
 describe('Test stream events', () => {
   beforeEach(async () => {
     const promiseArray = sampleData.map(
-      data => es.index({index: INDEX, type: TYPE, id: data.url, body: data}))
+      data => es.index({ index: INDEX, type: TYPE, id: data.url, body: data }))
     await Promise.all(promiseArray).catch(e => { console.log(e) })
   })
   afterEach(async () => {
     await es.indicesDelete()
   })
   it('MODIFY: should modify existing item', async () => {
-    await pushStream({event: modifyEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
+    await pushStream({ event: modifyEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true })
     await resolveAfter1Second() // give time for elasticsearch to refresh index
     const keys = converter(modifyEvent.Records[0].dynamodb.Keys)
     const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
@@ -53,7 +53,7 @@ describe('Test stream events', () => {
     assert.deepEqual(data, body._source)
   })
   it('REMOVE: should delete existing item', async () => {
-    await pushStream({event: removeEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
+    await pushStream({ event: removeEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true })
     await resolveAfter1Second() // give time for elasticsearch to refresh index
     const keys = converter(removeEvent.Records[0].dynamodb.Keys)
     const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
@@ -63,7 +63,7 @@ describe('Test stream events', () => {
   it('REMOVE: should not delete if item doen\'t exists', async () => {
     const event = removeEvent
     event.Records[0].dynamodb.Keys.url.S = 'something-which-doesnt-exists'
-    await pushStream({event, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
+    await pushStream({ event, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true })
     await resolveAfter1Second() // give time for elasticsearch to refresh index
     const keys = converter(removeEvent.Records[0].dynamodb.Keys)
     const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
@@ -71,7 +71,24 @@ describe('Test stream events', () => {
     assert.isFalse(body.found)
   })
   it('INSERT: should insert new item', async () => {
-    await pushStream({event: insertEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
+    await pushStream({ event: insertEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true })
+    await resolveAfter1Second() // give time for elasticsearch to refresh index
+    const keys = converter(insertEvent.Records[0].dynamodb.Keys)
+    const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
+    const body = await result.json()
+    assert.isTrue(body.found)
+    const data = removeEventData(converter(insertEvent.Records[0].dynamodb.NewImage))
+    assert.deepEqual(data, body._source)
+  })
+  it('INSERT: should insert new item when refresh false', async () => {
+    await pushStream({
+      event: insertEvent,
+      index: INDEX,
+      type: TYPE,
+      endpoint: ES_ENDPOINT,
+      refresh: false,
+      testMode: true
+    })
     await resolveAfter1Second() // give time for elasticsearch to refresh index
     const keys = converter(insertEvent.Records[0].dynamodb.Keys)
     const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
@@ -81,7 +98,7 @@ describe('Test stream events', () => {
     assert.deepEqual(data, body._source)
   })
   it('Multiple events: insert, remove, modify', async () => {
-    await pushStream({event: multipleEvents, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true})
+    await pushStream({ event: multipleEvents, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true })
     await resolveAfter1Second() // give time for elasticsearch to refresh index
     await resolveAfter1Second() // give time for elasticsearch to refresh index
     const removed = converter(multipleEvents.Records[2].dynamodb.Keys).url
@@ -106,32 +123,44 @@ describe('Test stream events', () => {
     const simpleData = {
       index: 12,
       type: 'test1',
-      body: {test: 'test', myvalue: {1: 'test'}},
+      body: { test: 'test', myvalue: { 1: 'test' } },
       id: '12',
       endpoint: ES_ENDPOINT,
       testMode: true
     }
-    await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct index')
+    await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct value for index')
   })
   it('Input data: wrong type is not a string', async () => {
     const simpleData = {
       index: 'asd',
       type: '',
-      body: {test: 'test', myvalue: {1: 'test'}},
+      body: { test: 'test', myvalue: { 1: 'test' } },
       id: '12',
       endpoint: ES_ENDPOINT,
       testMode: true
     }
-    await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct type')
+    await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct value for type')
   })
   it('Input data: wrong endpoint is not a string', async () => {
     const simpleData = {
       index: '12',
       type: 'test1',
-      body: {test: 'test', myvalue: {1: 'test'}},
+      body: { test: 'test', myvalue: { 1: 'test' } },
       id: '12',
       testMode: true
     }
-    await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct endpoint')
+    await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct value for endpoint')
+  })
+  it('Input data: wrong refresh is not a boolean', async () => {
+    const simpleData = {
+      index: 'asd',
+      type: 'asd',
+      body: { test: 'test', myvalue: { 1: 'test' } },
+      id: '12',
+      endpoint: ES_ENDPOINT,
+      refresh: 'true',
+      testMode: true
+    }
+    await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct value for refresh')
   })
 })
