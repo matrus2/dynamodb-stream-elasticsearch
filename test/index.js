@@ -101,6 +101,11 @@ describe('Test stream events', () => {
     await pushStream({ event: multipleEvents, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true })
     await resolveAfter1Second() // give time for elasticsearch to refresh index
     await resolveAfter1Second() // give time for elasticsearch to refresh index
+    await resolveAfter1Second() // give time for elasticsearch to refresh index
+    await resolveAfter1Second() // give time for elasticsearch to refresh index
+    await resolveAfter1Second() // give time for elasticsearch to refresh index
+    await resolveAfter1Second() // give time for elasticsearch to refresh index
+    await resolveAfter1Second() // give time for elasticsearch to refresh index
     const removed = converter(multipleEvents.Records[2].dynamodb.Keys).url
     const inserted = converter(multipleEvents.Records[0].dynamodb.Keys).url
     const changed = converter(multipleEvents.Records[1].dynamodb.Keys).url

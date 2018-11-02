@@ -4,7 +4,7 @@
   "description": "Missing blueprint for AWS Lambda. Reads stream from AWS DynamoDB and writes it to AWS ElasticSearch.",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha test/index.js --timeout 6000",
+    "test": "mocha test/index.js --timeout 10000",
     "publish:patch": "npm version patch && npm publish",
     "publish:minor": "npm version minor && npm publish",
     "publish:major": "npm version major && npm publish"
@@ -32,20 +32,19 @@
   },
   "homepage": "https://github.com/matrus2/dynamodb-stream-elasticsearch#readme",
   "devDependencies": {
-    "chai": "^4.1.2",
-    "eslint": "^4.19.0",
-    "eslint-config-standard": "^11.0.0",
-    "eslint-plugin-import": "^2.9.0",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-promise": "^3.7.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "mocha": "^5.0.4",
-    "node-fetch": "^2.1.1",
-    "nsp": "^3.2.1"
+    "chai": "^4.2.0",
+    "eslint": "^5.8.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "mocha": "^5.2.0",
+    "node-fetch": "^2.2.0"
   },
   "dependencies": {
-    "aws-sdk": "^2.211.1",
-    "elasticsearch": "^14.2.1",
-    "http-aws-es": "^4.0.0"
+    "aws-sdk": "^2.347.0",
+    "elasticsearch": "^15.2.0",
+    "http-aws-es": "^6.0.0"
   }
 }
