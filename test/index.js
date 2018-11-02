@@ -6,6 +6,7 @@ const { pushStream } = require('./../src/index')
 const elastic = require('../src/utils/es-wrapper')
 const { sampleData, modifyEvent, removeEvent, insertEvent, multipleEvents } = require('./fixtures')
 const { removeEventData } = require('../src/utils/index')
+const getTableNameFromARN = require('../src/utils/table-name-from-arn')
 
 const converter = AWS.DynamoDB.Converter.unmarshall
 const INDEX = 'test'
@@ -97,6 +98,17 @@ describe('Test stream events', () => {
     const data = removeEventData(converter(insertEvent.Records[0].dynamodb.NewImage))
     assert.deepEqual(data, body._source)
   })
+  it('INSERT: should insert new item based on ARN values', async () => {
+    await pushStream({ event: insertEvent, endpoint: ES_ENDPOINT, testMode: true })
+    await resolveAfter1Second() // give time for elasticsearch to refresh index
+    const keys = converter(insertEvent.Records[0].dynamodb.Keys)
+    const arnKey = getTableNameFromARN(insertEvent.Records[0].eventSourceARN)
+    const result = await fetch(`http://${ES_ENDPOINT}/${arnKey}/${arnKey}/${keys.url}`)
+    const body = await result.json()
+    assert.isTrue(body.found)
+    const data = removeEventData(converter(insertEvent.Records[0].dynamodb.NewImage))
+    assert.deepEqual(data, body._source)
+  })
   it('Multiple events: insert, remove, modify', async () => {
     await pushStream({ event: multipleEvents, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true })
     await resolveAfter1Second() // give time for elasticsearch to refresh index
@@ -138,7 +150,7 @@ describe('Test stream events', () => {
   it('Input data: wrong type is not a string', async () => {
     const simpleData = {
       index: 'asd',
-      type: '',
+      type: 1,
       body: { test: 'test', myvalue: { 1: 'test' } },
       id: '12',
       endpoint: ES_ENDPOINT,

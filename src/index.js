@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk')
 const converter = AWS.DynamoDB.Converter.unmarshall
 const elastic = require('./utils/es-wrapper')
+const getTableNameFromARN = require('./utils/table-name-from-arn')
 const { removeEventData } = require('./utils/index')
 
 const validateString = (param, paramName) => {
@@ -10,7 +11,15 @@ const validateBoolean = (param, paramName) => {
   if (!(typeof param === 'boolean')) throw new Error(`Please provide correct value for ${paramName}`)
 }
 
-exports.pushStream = async ({ event, index, type, endpoint, refresh = true, testMode = false } = {}) => {
+exports.pushStream = async (
+  {
+    event,
+    index = getTableNameFromARN(event.Records[0].eventSourceARN),
+    type = getTableNameFromARN(event.Records[0].eventSourceARN),
+    endpoint,
+    refresh = true,
+    testMode = false
+  } = {}) => {
   validateString(index, 'index')
   validateString(type, 'type')
   validateString(endpoint, 'endpoint')
