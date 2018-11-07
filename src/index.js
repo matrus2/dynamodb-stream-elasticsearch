@@ -27,7 +27,7 @@ exports.pushStream = async (
 
   const es = elastic(endpoint, testMode)
 
-  event.Records.forEach(async (record) => {
+  for (const record of event.Records) {
     const keys = converter(record.dynamodb.Keys)
     const id = Object.values(keys).reduce((acc, curr) => acc.concat(curr), '')
 
@@ -56,5 +56,5 @@ exports.pushStream = async (
       default:
         throw new Error(record.eventName + ' wasn\'t recognized')
     }
-  })
+  }
 }

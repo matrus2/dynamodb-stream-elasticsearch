@@ -59,7 +59,7 @@ Upload Lambda to AWS and _star_ this repository if it works as expected!!
 | endpoint  | Exact url of ElasticSearch instance (it works with AWS ES and standard ES) (string) | required
 | index  | The name of ElasticSearch index (string). If not provided will set the same as DynamoDB table name | optional
 | type  | The type of the ElasticSearch document (string). If not provided will set the same as DynamoDB table name | optional
-| refresh  | Force ElasticSearch refresh its index immediately (boolean). Default: true | optional
+| refresh  | Force ElasticSearch refresh its index immediately [more here](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html) (boolean). Default: true | optional
 
 
 ## Contributing and running the tests
