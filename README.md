@@ -86,3 +86,9 @@ If you want to commit changes, make sure if follow these rules:
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
+## Donate
+
+If you find this project to be useful and you would like to support the author for maintaining it, you might consider to make any donation under this link:
+
+[Donate via Paypal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8DRSB8GWY24R8&source=url)
+
