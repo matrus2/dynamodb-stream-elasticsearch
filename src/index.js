@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const converter = AWS.DynamoDB.Converter.unmarshall
+const unmarshall = AWS.DynamoDB.Converter.unmarshall
 const elastic = require('./utils/es-wrapper')
 const getTableNameFromARN = require('./utils/table-name-from-arn')
 const { removeEventData } = require('./utils/index')
@@ -9,6 +9,23 @@ const validateString = (param, paramName) => {
 }
 const validateBoolean = (param, paramName) => {
   if (!(typeof param === 'boolean')) throw new Error(`Please provide correct value for ${paramName}`)
+}
+
+const adaptDynamoRecordToElasticsearchBody = (data) => {
+  const body = unmarshall(data)
+  return Object.entries(body).reduce((newBody, [name, value]) => {
+    switch (typeof value) {
+      case 'object':
+        newBody[name] = value.values
+        break
+      case 'string':
+        newBody[name] = value.startsWith('{"') ? JSON.parse(value) : value
+        break
+      default:
+        newBody[name] = value
+    }
+    return newBody
+  }, {})
 }
 
 exports.pushStream = async (
@@ -28,7 +45,7 @@ exports.pushStream = async (
   const es = elastic(endpoint, testMode)
 
   for (const record of event.Records) {
-    const keys = converter(record.dynamodb.Keys)
+    const keys = adaptDynamoRecordToElasticsearchBody(record.dynamodb.Keys)
     const id = Object.values(keys).reduce((acc, curr) => acc.concat(curr), '')
 
     switch (record.eventName) {
@@ -44,7 +61,7 @@ exports.pushStream = async (
       }
       case 'MODIFY':
       case 'INSERT': {
-        let body = converter(record.dynamodb.NewImage)
+        let body = adaptDynamoRecordToElasticsearchBody(record.dynamodb.NewImage)
         body = removeEventData(body)
         try {
           await es.index({ index, type, id, body, refresh })
