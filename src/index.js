@@ -28,6 +28,7 @@ const adaptDynamoRecordToElasticsearchBody = (data) => {
   }, {})
 }
 
+exports.adaptDynamoRecordToElasticsearchBody = adaptDynamoRecordToElasticsearchBody
 exports.pushStream = async (
   {
     event,

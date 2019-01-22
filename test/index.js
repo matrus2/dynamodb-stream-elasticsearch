@@ -2,13 +2,14 @@
 const { assert } = require('chai')
 const fetch = require('node-fetch')
 const AWS = require('aws-sdk')
-const { pushStream } = require('./../src/index')
+const { pushStream, adaptDynamoRecordToElasticsearchBody } = require('./../src/index')
 const elastic = require('../src/utils/es-wrapper')
 const { sampleData, modifyEvent, removeEvent, insertEvent, multipleEvents } = require('./fixtures')
 const { removeEventData } = require('../src/utils/index')
 const getTableNameFromARN = require('../src/utils/table-name-from-arn')
 
 const converter = AWS.DynamoDB.Converter.unmarshall
+const marshall = AWS.DynamoDB.Converter.marshall
 const INDEX = 'test'
 const TYPE = 'test1'
 const ES_ENDPOINT = 'localhost:9200'
@@ -183,5 +184,25 @@ describe('Test stream events', () => {
       testMode: true
     }
     await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct value for refresh')
+  })
+  it('should convert Set and inner object fields to Elasticsearch body', () => {
+    const data = marshall({
+      countries: { // mock DynamoDBSet type: String Set
+        values: ['US', 'ES', 'UK']
+      },
+      companies: { // mock DynamoDBSet type:Number Set
+        values: [1, 2, 3]
+      },
+      address: JSON.stringify({ // String to AttributeValue Map
+        street: '123 Great Road',
+        zip: '45678'
+      })
+    })
+    const body = adaptDynamoRecordToElasticsearchBody(data)
+    assert.deepEqual(body, {
+      countries: ['US', 'ES', 'UK'],
+      companies: [1, 2, 3],
+      address: { street: '123 Great Road', zip: '45678' }
+    })
   })
 })
