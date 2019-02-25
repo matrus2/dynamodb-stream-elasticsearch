@@ -95,6 +95,23 @@ describe('Test stream events', () => {
     const data = removeEventData(converter(insertEvent.Records[0].dynamodb.NewImage))
     assert.deepEqual(data, body._source)
   })
+  it('INSERT: should insert new item with new field', async () => {
+    await pushStream({ event: insertEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true, transformFunction: insertFullAddress })
+    const keys = converter(insertEvent.Records[0].dynamodb.Keys)
+    const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
+    const body = await result.json()
+    assert.isTrue(body.found)
+    assert.property(body._source, 'full_address')
+  })
+  it('INSERT: should insert new item without new field', async () => {
+    await pushStream({ event: insertEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true, transformFunction: undefined })
+    const keys = converter(insertEvent.Records[0].dynamodb.Keys)
+    const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
+    const body = await result.json()
+    assert.isTrue(body.found)
+    const data = removeEventData(converter(insertEvent.Records[0].dynamodb.NewImage))
+    assert.deepEqual(data, body._source)
+  })
   it('Multiple events: insert, remove, modify', async () => {
     await pushStream({ event: multipleEvents, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true })
     const removed = converter(multipleEvents.Records[2].dynamodb.Keys).url
@@ -184,4 +201,27 @@ describe('Test stream events', () => {
     }
     await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct value for refresh')
   })
+  it('Input data: wrong transform function', async () => {
+    const simpleData = {
+      index: 'asd',
+      type: 'asd',
+      body: { test: 'test', myvalue: { 1: 'test' } },
+      id: '12',
+      endpoint: ES_ENDPOINT,
+      refresh: true,
+      testMode: true,
+      transformFunction: null
+    }
+    await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct value for transformFunction')
+  })
 })
+
+function insertFullAddress (record) {
+  let hydratedRecord = JSON.parse(JSON.stringify(record))
+  hydratedRecord.full_address = getFieldContent(record.city, '. ') + getFieldContent(record.country + '.')
+  return hydratedRecord
+}
+
+const getFieldContent = (content, sep = ' ') => {
+  return content ? content + sep : ''
+}
