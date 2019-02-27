@@ -10,6 +10,9 @@ const validateString = (param, paramName) => {
 const validateBoolean = (param, paramName) => {
   if (!(typeof param === 'boolean')) throw new Error(`Please provide correct value for ${paramName}`)
 }
+const validateFunctionOrUndefined = (param, paramName) => {
+  if (!(typeof param === 'undefined' || typeof param === 'function')) throw new Error(`Please provide correct value for ${paramName}`)
+}
 
 exports.pushStream = async (
   {
@@ -18,12 +21,14 @@ exports.pushStream = async (
     type = getTableNameFromARN(event.Records[0].eventSourceARN),
     endpoint,
     refresh = true,
-    testMode = false
+    testMode = false,
+    transformFunction = undefined
   } = {}) => {
   validateString(index, 'index')
   validateString(type, 'type')
   validateString(endpoint, 'endpoint')
   validateBoolean(refresh, 'refresh')
+  validateFunctionOrUndefined(transformFunction, 'transformFunction')
 
   const es = elastic(endpoint, testMode)
 
@@ -46,6 +51,9 @@ exports.pushStream = async (
       case 'INSERT': {
         let body = converter(record.dynamodb.NewImage)
         body = removeEventData(body)
+        if (transformFunction) {
+          body = transformFunction(body)
+        }
         try {
           await es.index({ index, type, id, body, refresh })
         } catch (e) {

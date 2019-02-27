@@ -60,6 +60,7 @@ Upload Lambda to AWS and _star_ this repository if it works as expected!!
 | index  | The name of ElasticSearch index (string). If not provided will set the same as DynamoDB table name | optional
 | type  | The type of the ElasticSearch document (string). If not provided will set the same as DynamoDB table name | optional
 | refresh  | Force ElasticSearch refresh its index immediately [more here](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html) (boolean). Default: true | optional
+| transformFunction  | A function to transform each record before sending them to ES. Applies to INSERT and UPDATE operations | optional
 
 
 ## Contributing and running the tests
@@ -76,11 +77,12 @@ If you want to commit changes, make sure if follow these rules:
 
 #### TODO
 - Introduce Continuous Integration;
-- Add elastic search bulk operation instead of index for multiple records; 
+- Add elastic search bulk operation instead of index for multiple records
 
 ## Authors & Contributors
 
 * [matrus2](https://github.com/matrus2)
+* [cdelgadob](https://github.com/cdelgadob)
 
 ## License
 
