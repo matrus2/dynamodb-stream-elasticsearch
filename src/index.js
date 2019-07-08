@@ -52,7 +52,7 @@ exports.pushStream = async (
         let body = converter(record.dynamodb.NewImage)
         body = removeEventData(body)
         if (transformFunction) {
-          body = transformFunction(body)
+          body = await Promise.resolve(transformFunction(body))
         }
         try {
           await es.index({ index, type, id, body, refresh })
