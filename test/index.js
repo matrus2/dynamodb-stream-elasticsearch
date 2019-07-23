@@ -28,7 +28,6 @@ async function assertThrowsAsync (fn, regExp) {
 // 1. run a docker container
 // docker run -i -p 9200:9200 --name my_elastic -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.2.0
 describe('Test stream events', () => {
-
   beforeEach(async () => {
     const promiseArray = sampleData.map(
       data => es.index({ index: INDEX, type: TYPE, id: data.url, body: data }))
@@ -291,10 +290,28 @@ describe('Test stream events', () => {
     }
     await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct value for transformFunction')
   })
+
+  it('INSERT: should insert new item based on elasticSearchOptions ', async () => {
+    await pushStream({
+      event: insertEvent,
+      index: INDEX,
+      type: TYPE,
+      endpoint: 'tobeoverwritten',
+      testMode: true,
+      transformFunction: undefined,
+      elasticSearchOptions: { hosts: 'localhost:9200' }
+    })
+    const keys = converter(insertEvent.Records[0].dynamodb.Keys)
+    const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
+    const body = await result.json()
+    assert.isTrue(body.found)
+    const data = removeEventData(converter(insertEvent.Records[0].dynamodb.NewImage))
+    assert.deepEqual(data, body._source)
+  })
 })
 
 function insertFullAddress (record) {
-  let hydratedRecord = JSON.parse(JSON.stringify(record))
+  const hydratedRecord = JSON.parse(JSON.stringify(record))
   hydratedRecord.full_address = getFieldContent(record.city, '. ') + getFieldContent(record.country + '.')
   return hydratedRecord
 }
