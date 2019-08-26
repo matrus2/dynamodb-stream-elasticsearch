@@ -291,6 +291,36 @@ describe('Test stream events', () => {
     await assertThrowsAsync(async () => pushStream(simpleData), 'Please provide correct value for transformFunction')
   })
 
+  it('Input data: should skip index if body is false', async () => {
+    await pushStream({
+      event: insertEvent,
+      index: INDEX,
+      type: TYPE,
+      endpoint: ES_ENDPOINT,
+      transformFunction: (body) => false,
+      testMode: true
+    })
+    const inserted = converter(insertEvent.Records[0].dynamodb.Keys).url
+    result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`)
+    body = await result.json()
+    assert.isFalse(body.found)
+  })
+
+  it('Input data: should skip index if body is empty', async () => {
+    await pushStream({
+      event: insertEvent,
+      index: INDEX,
+      type: TYPE,
+      endpoint: ES_ENDPOINT,
+      transformFunction: body => {},
+      testMode: true
+    });
+    const inserted = converter(insertEvent.Records[0].dynamodb.Keys).url;
+    result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`);
+    body = await result.json();
+    assert.isFalse(body.found);
+  });
+
   it('INSERT: should insert new item based on elasticSearchOptions ', async () => {
     await pushStream({
       event: insertEvent,

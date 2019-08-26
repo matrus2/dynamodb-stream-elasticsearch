@@ -60,7 +60,7 @@ Upload Lambda to AWS and _star_ this repository if it works as expected!!
 | index  | The name of ElasticSearch index (string). If not provided will set the same as DynamoDB table name | optional
 | type  | The type of the ElasticSearch document (string). If not provided will set the same as DynamoDB table name | optional
 | refresh  | Force ElasticSearch refresh its index immediately [more here](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html) (boolean). Default: true | optional
-| transformFunction  | A function/promise to transform each record before sending them to ES. Applies to INSERT and UPDATE operations | optional
+| transformFunction  | A function/promise to transform each record before sending them to ES. Applies to INSERT and UPDATE operations. If transformFunction returns an empty object or false the row will be skipped. | optional
 | elasticSearchOptions  | Additional set of arguments passed to elasticsearch Client see [here](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/16.x/configuration.html#config-options) | optional
 
 
