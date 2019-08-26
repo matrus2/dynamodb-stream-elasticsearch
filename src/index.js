@@ -56,8 +56,11 @@ exports.pushStream = async (
           body = await Promise.resolve(transformFunction(body))
         }
         try {
-          if (body) {
-            await es.index({ index, type, id, body, refresh })
+          if (
+            body &&
+            (Object.keys(body).length !== 0 && body.constructor === Object)
+          ) {
+            await es.index({ index, type, id, body, refresh });
           }
         } catch (e) {
           throw new Error(e)
