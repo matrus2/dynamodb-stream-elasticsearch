@@ -315,7 +315,7 @@ describe('Test stream events', () => {
       transformFunction: body => {},
       testMode: true
     });
-    const inserted = converter(insertEvent.Records[0].dynamodb.Keys).url;
+    const inserted = converter(modifyEvent.Records[0].dynamodb.Keys).url;
     result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`);
     body = await result.json();
     assert.isFalse(body.found);
@@ -340,8 +340,8 @@ describe('Test stream events', () => {
     result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`);
     body = await result.json();
     assert.isTrue(body.found);
-    const data = removeEventData(converter(insertEvent.Records[0].dynamodb.NewImage))
-    const oldData = removeEventData(converter(insertEvent.Records[0].dynamodb.OldImage))
+    const data = removeEventData(converter(modifyEvent.Records[0].dynamodb.NewImage))
+    const oldData = removeEventData(converter(modifyEvent.Records[0].dynamodb.OldImage))
     assert.deepEqual({
       ...data,
       city: oldData.city
