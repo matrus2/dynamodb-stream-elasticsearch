@@ -30,15 +30,35 @@ const modifyEvent = {
             N: '3'
           },
           url: {
+            S: 'russ-wintheiser-c240e6ac-4'
+          },
+          name: {
+            S: 'russ wintheiser'
+          },
+        },
+        OldImage: {
+          country: {
+            S: 'US'
+          },
+          addedDate: {
+            N: '1518102681654'
+          },
+          city: {
+            S: 'Arick view'
+          },
+          company_id: {
+            N: '3'
+          },
+          url: {
             S: 'russ-wintheiser-c240e6ac-3'
           },
           name: {
             S: 'russ wintheiser'
           },
-          SequenceNumber: '214655900000000005192458861',
-          SizeBytes: 16438,
-          StreamViewType: 'NEW_IMAGE'
-        }
+        },
+        SequenceNumber: '214655900000000005192458861',
+        SizeBytes: 16438,
+        StreamViewType: 'NEW_AND_OLD_IMAGES'
       },
       eventSourceARN:
         'arn:aws:dynamodb:us-east-1:945413996076:table/Candidates/stream/2018-02-26T13:30:22.250'
