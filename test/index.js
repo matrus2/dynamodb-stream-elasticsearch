@@ -301,8 +301,8 @@ describe('Test stream events', () => {
       testMode: true
     })
     const inserted = converter(insertEvent.Records[0].dynamodb.Keys).url
-    result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`)
-    body = await result.json()
+    const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`)
+    const body = await result.json()
     assert.isFalse(body.found)
   })
 
@@ -314,13 +314,13 @@ describe('Test stream events', () => {
       endpoint: ES_ENDPOINT,
       transformFunction: body => {},
       testMode: true
-    });
-    const inserted = converter(modifyEvent.Records[0].dynamodb.Keys).url;
-    result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`);
-    body = await result.json();
-    assert.isFalse(body.found);
-  });
-  
+    })
+    const inserted = converter(insertEvent.Records[0].dynamodb.Keys).url
+    const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`)
+    const body = await result.json()
+    assert.isFalse(body.found)
+  })
+
   it('Input data: should transform and insert based on action given oldImage', async () => {
     await pushStream({
       event: modifyEvent,
@@ -328,25 +328,25 @@ describe('Test stream events', () => {
       type: TYPE,
       endpoint: ES_ENDPOINT,
       transformFunction: (body, oldBody) => {
-        const { city } = oldBody;
+        const { city } = oldBody
         return {
           ...body,
           city
         }
       },
       testMode: true
-    });
-    const inserted = converter(insertEvent.Records[0].dynamodb.Keys).url;
-    result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`);
-    body = await result.json();
-    assert.isTrue(body.found);
+    })
+    const inserted = converter(modifyEvent.Records[0].dynamodb.Keys).url
+    const result = await fetch(`http://${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`)
+    const body = await result.json()
+    assert.isTrue(body.found)
     const data = removeEventData(converter(modifyEvent.Records[0].dynamodb.NewImage))
     const oldData = removeEventData(converter(modifyEvent.Records[0].dynamodb.OldImage))
     assert.deepEqual({
       ...data,
       city: oldData.city
     }, body._source)
-  });
+  })
 
   it('INSERT: should insert new item based on elasticSearchOptions ', async () => {
     await pushStream({

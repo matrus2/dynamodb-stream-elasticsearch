@@ -61,7 +61,7 @@ exports.pushStream = async (
             body &&
             (Object.keys(body).length !== 0 && body.constructor === Object)
           ) {
-            await es.index({ index, type, id, body, refresh });
+            await es.index({ index, type, id, body, refresh })
           }
         } catch (e) {
           throw new Error(e)

@@ -34,7 +34,7 @@ const modifyEvent = {
           },
           name: {
             S: 'russ wintheiser'
-          },
+          }
         },
         OldImage: {
           country: {
@@ -54,7 +54,7 @@ const modifyEvent = {
           },
           name: {
             S: 'russ wintheiser'
-          },
+          }
         },
         SequenceNumber: '214655900000000005192458861',
         SizeBytes: 16438,
