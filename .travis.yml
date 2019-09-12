@@ -1,6 +1,10 @@
 language: node_js
 node_js:
-- 10
+  - 10
+services:
+  - elasticsearch
+before_script:
+  - sleep 20
 cache: npm
 script:
   - npm run lint
