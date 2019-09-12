@@ -51,9 +51,10 @@ exports.pushStream = async (
       case 'MODIFY':
       case 'INSERT': {
         let body = converter(record.dynamodb.NewImage)
+        const oldBody = record.dynamodb.OldImage ? converter(record.dynamodb.OldImage) : undefined
         body = removeEventData(body)
         if (transformFunction) {
-          body = await Promise.resolve(transformFunction(body))
+          body = await Promise.resolve(transformFunction(body, oldBody))
         }
         try {
           if (
