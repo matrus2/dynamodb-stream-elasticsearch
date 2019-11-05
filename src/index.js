@@ -54,7 +54,7 @@ exports.pushStream = async (
         const oldBody = record.dynamodb.OldImage ? converter(record.dynamodb.OldImage) : undefined
         body = removeEventData(body)
         if (transformFunction) {
-          body = await Promise.resolve(transformFunction(body, oldBody, record.dynamodb.NewImage)
+          body = await Promise.resolve(transformFunction(body, oldBody, record.dynamodb.NewImage))
         }
         try {
           if (
