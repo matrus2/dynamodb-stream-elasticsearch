@@ -2,7 +2,6 @@ const { Client } = require('@elastic/elasticsearch')
 const { createAWSConnection, awsGetCredentials } = require('@acuris/aws-es-connection')
 
 module.exports = async (node, testMode, options) => {
-
   const esParams = { node }
   // Because we use ordinary elasticsearch container instead of AWS elasticsearch for integration tests
   // then if endpoint is localhost we cannot upload aws credentials
