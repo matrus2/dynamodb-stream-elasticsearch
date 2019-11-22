@@ -31,7 +31,7 @@ exports.pushStream = async (
   validateBoolean(refresh, 'refresh')
   validateFunctionOrUndefined(transformFunction, 'transformFunction')
 
-  const es = elastic(endpoint, testMode, elasticSearchOptions)
+  const es = await elastic(endpoint, testMode, elasticSearchOptions)
 
   for (const record of event.Records) {
     const keys = converter(record.dynamodb.Keys)
@@ -40,7 +40,7 @@ exports.pushStream = async (
     switch (record.eventName) {
       case 'REMOVE': {
         try {
-          if (await es.exists({ index, type, id, refresh })) {
+          if ((await es.exists({ index, type, id, refresh })).body) {
             await es.remove({ index, type, id, refresh })
           }
         } catch (e) {
