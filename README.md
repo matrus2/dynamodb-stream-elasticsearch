@@ -28,7 +28,7 @@ Whenever data is changed (modified, removed or inserted) in DynamoDB one can use
 ## Getting Started
 
 Install:
-```javascript
+```bash
 npm i dynamodb-stream-elasticsearch 
 ```
 Use it in your lambda:
@@ -61,17 +61,38 @@ Upload Lambda to AWS and _star_ this repository if it works as expected!!
 | index  | The name of ElasticSearch index (string). If not provided will set the same as DynamoDB table name | optional
 | type  | The type of the ElasticSearch document (string). If not provided will set the same as DynamoDB table name | optional
 | refresh  | Force ElasticSearch refresh its index immediately [more here](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html) (boolean). Default: true | optional
-| transformFunction  | A function/promise to transform each record before sending them to ES. Applies to INSERT and UPDATE operations. If transformFunction returns an empty object or false the row will be skipped. This function will receive `body` (NewImage) and `oldBody` (OldImage) as arguments. | optional
+| transformFunction  | A function/promise to transform each record before sending them to ES. Applies to INSERT and UPDATE operations. If transformFunction returns an empty object or false the row will be skipped. This function will receive `body` (NewImage), `oldBody` (OldImage) and (record) as the whole record as arguments. | optional
 | elasticSearchOptions  | Additional set of arguments passed to elasticsearch Client see [here](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/16.x/configuration.html#config-options) | optional
 
 
-## Contributing and running the tests
+## Running the tests
 
+### Setup elastic node 
+Docker can be used to host a node of elastic search
+
+Docker by default tries to pull the ```elasticsearch:latest``` tag from the repository if no version is specifies. 
+The tag ```latest`` does not exists, therefore a specific version needs to be specified ie: ```7.2.0```.
 To run tests locally you need to have ElasticSearch docker container. Simply type:
 
 ```bash
-docker run -i -p 9200:9200 --name my_elastic -p 9300:9300 -e "discovery.type=single-node" elasticsearch
+docker run -i -p 9200:9200 --name my_elastic -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.2.0
+```   
+### Running tests
+
+Tests are written in using mocha [https://mochajs.org/]. In order to run them ensure that mocha command is available on the path:
+
+```bash
+npm install -g mocha
+```                 
+
+Head in the test folder and launch
+
+```bash
+mocha index.js
 ```
+
+### Contributing
+
 If you want to commit changes, make sure if follow these rules:
 1. All code changes should go with a proper integration test;
 2. Code should follow [Javascript Standard Guideline](https://standardjs.com/);

@@ -348,6 +348,22 @@ describe('Test stream events', () => {
     }, body._source)
   })
 
+  it('Input data: can access record content in the transform function', async () => {
+    await pushStream({
+      event: modifyEvent,
+      index: INDEX,
+      type: TYPE,
+      endpoint: ES_ENDPOINT,
+      transformFunction: (body, oldBody, record) => {
+        const dynamoDbJSON = record.dynamodb.NewImage;
+        assert.isObject(dynamoDbJSON.city)
+        assert.isString(dynamoDbJSON.city.S)
+        return null
+      },
+      testMode: true
+    })
+  })
+
   it('INSERT: should insert new item based on elasticSearchOptions ', async () => {
     await pushStream({
       event: insertEvent,
