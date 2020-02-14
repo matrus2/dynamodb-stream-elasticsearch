@@ -355,7 +355,7 @@ describe('Test stream events', () => {
       type: TYPE,
       endpoint: ES_ENDPOINT,
       transformFunction: (body, oldBody, record) => {
-        const dynamoDbJSON = record.dynamodb.NewImage;
+        const dynamoDbJSON = record.dynamodb.NewImage
         assert.isObject(dynamoDbJSON.city)
         assert.isString(dynamoDbJSON.city.S)
         return null
