@@ -68,6 +68,11 @@ Upload Lambda to AWS and _star_ this repository if it works as expected!!
 ## Running the tests
 
 ### Setup elastic node 
+Docker can be used to host a node of elastic search
+
+Docker by default tries to pull the ```elasticsearch:latest``` tag from the repository if no version is specifies. 
+The tag ```latest`` does not exists, therefore a specific version needs to be specified ie: ```7.2.0```.
+### Setup elastic node 
 Docker can be used to host a node of elasticsearch
 
 Docker by default tries to pull the ```elasticsearch:latest``` tag from the repository if no version is specifies. 
@@ -75,6 +80,20 @@ The tag ```latest`` does not exists, therefore a specific version needs to be sp
 To run tests locally you need to have ElasticSearch docker container. Simply type:
 
 ```bash
+docker run -i -p 9200:9200 --name my_elastic -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.2.0
+```   
+### Running tests
+
+Tests are written in using mocha [https://mochajs.org/]. In order to run them ensure that mocha command is available on the path:
+
+```bash
+npm install -g mocha
+```                 
+
+Head in the test folder and launch
+
+```bash
+mocha index.js
 docker run -i -p 9200:9200 --name my_elastic -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.2.0
 ```   
 ### Running tests
