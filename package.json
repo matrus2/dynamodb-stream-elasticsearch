@@ -44,8 +44,8 @@
     "node-fetch": "^2.6.0"
   },
   "dependencies": {
-    "aws-sdk": "^2.469.0",
-    "elasticsearch": "^15.5.0",
-    "http-aws-es": "^6.0.0"
+    "@acuris/aws-es-connection": "^1.0.1",
+    "@elastic/elasticsearch": "^7.4.0",
+    "aws-sdk": "^2.469.0"
   }
 }
