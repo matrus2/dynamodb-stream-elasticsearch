@@ -41,7 +41,6 @@ describe('Test stream events', () => {
   })
 
   it('MODIFY: should modify existing item', async () => {
-    console.log('MODIFY')
     await pushStream({ event: modifyEvent, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, testMode: true })
     const keys = converter(modifyEvent.Records[0].dynamodb.Keys)
     const result = await fetch(`${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
@@ -359,7 +358,7 @@ describe('Test stream events', () => {
       endpoint: 'tobeoverwritten',
       testMode: true,
       transformFunction: undefined,
-      elasticSearchOptions: { node: 'http://localhost:9200' }
+      elasticSearchOptions: { node: ES_ENDPOINT }
     })
     const keys = converter(insertEvent.Records[0].dynamodb.Keys)
     const result = await fetch(`${ES_ENDPOINT}/${INDEX}/${TYPE}/${keys.url}`)
