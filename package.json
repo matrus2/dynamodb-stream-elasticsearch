@@ -34,18 +34,21 @@
   "homepage": "https://github.com/matrus2/dynamodb-stream-elasticsearch#readme",
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^6.0.1",
-    "eslint-config-standard": "^13.0.0",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.0",
     "eslint-plugin-import": "^2.18.0",
-    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
-    "mocha": "^6.1.4",
-    "node-fetch": "^2.6.0"
+    "mocha": "^7.1.1",
+    "node-fetch": "^2.6.0",
+    "prettier": "^1.19.1",
+    "typescript": "^3.8.1"
   },
   "dependencies": {
     "@acuris/aws-es-connection": "^1.0.1",
-    "@elastic/elasticsearch": "^7.4.0",
-    "aws-sdk": "^2.469.0"
-  }
+    "@elastic/elasticsearch": "^7.6.1",
+    "aws-sdk": "^2.642.0"
+  },
+  "typings": "./src/index.d.ts"
 }
