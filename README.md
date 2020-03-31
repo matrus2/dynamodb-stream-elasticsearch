@@ -72,28 +72,9 @@ Docker can be used to host a node of Elasticsearch
 
 Docker by default tries to pull the ```elasticsearch:latest``` tag from the repository if no version is specified. 
 The tag ```latest`` does not exists, therefore a specific version needs to be specified ie: ```7.2.0```.
-### Setup elastic node 
-Docker can be used to host a node of elasticsearch
-
-Docker by default tries to pull the ```elasticsearch:latest``` tag from the repository if no version is specifies. 
-The tag ```latest`` does not exists, therefore a specific version needs to be specified ie: ```7.2.0```.
 To run tests locally you need to have an Elasticsearch Docker container running. Simply type:
 
 ```bash
-docker run -i -p 9200:9200 --name my_elastic -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.2.0
-```   
-### Running tests
-
-Tests are written in using mocha [https://mochajs.org/]. Tests can be launched using:
-
-```bash
-npm install -g mocha
-```                 
-
-Head in the test folder and launch
-
-```bash
-mocha index.js
 docker run -i -p 9200:9200 --name my_elastic -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.2.0
 ```   
 ### Running tests
