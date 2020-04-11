@@ -44,7 +44,7 @@ exports.pushStream = async (
             await es.remove({ index, type, id, refresh })
           }
         } catch (e) {
-          throw new Error(e)
+          throw e
         }
         break
       }
@@ -64,7 +64,7 @@ exports.pushStream = async (
             await es.index({ index, type, id, body, refresh })
           }
         } catch (e) {
-          throw new Error(e)
+          throw e
         }
         break
       }
