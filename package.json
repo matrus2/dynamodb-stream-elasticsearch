@@ -48,7 +48,8 @@
   "dependencies": {
     "@acuris/aws-es-connection": "^1.0.1",
     "@elastic/elasticsearch": "^7.6.1",
-    "aws-sdk": "^2.642.0"
+    "aws-sdk": "^2.642.0",
+    "lodash.flatmap": "^4.5.0"
   },
   "typings": "./src/index.d.ts"
 }

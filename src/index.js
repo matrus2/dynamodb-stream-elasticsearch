@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk')
+const flatMap = require('lodash.flatmap')
 const converter = AWS.DynamoDB.Converter.unmarshall
 const elastic = require('./utils/es-wrapper')
 const getTableNameFromARN = require('./utils/table-name-from-arn')
@@ -33,19 +34,16 @@ exports.pushStream = async (
 
   const es = await elastic(endpoint, testMode, elasticSearchOptions)
 
+  const toRemove = []
+  const toUpsert = []
+
   for (const record of event.Records) {
     const keys = converter(record.dynamodb.Keys)
     const id = Object.values(keys).reduce((acc, curr) => acc.concat(curr), '')
 
     switch (record.eventName) {
       case 'REMOVE': {
-        try {
-          if ((await es.exists({ index, type, id, refresh })).body) {
-            await es.remove({ index, type, id, refresh })
-          }
-        } catch (e) {
-          throw new Error(e)
-        }
+        toRemove.push({ index, type, id, refresh })
         break
       }
       case 'MODIFY':
@@ -61,7 +59,7 @@ exports.pushStream = async (
             body &&
             (Object.keys(body).length !== 0 && body.constructor === Object)
           ) {
-            await es.index({ index, type, id, body, refresh })
+            toUpsert.push({ index, type, id, body, refresh })
           }
         } catch (e) {
           throw new Error(e)
@@ -71,5 +69,19 @@ exports.pushStream = async (
       default:
         throw new Error(record.eventName + ' wasn\'t recognized')
     }
+  }
+
+  if (toRemove.length > 0) {
+    const bodyDelete = flatMap(toRemove, (doc) => [{ delete: { _index: doc.index, _id: doc.id } }])
+    await es.bulk({ refresh: true, body: bodyDelete })
+  }
+
+  if (toUpsert.length > 0) {
+    const updateBody = flatMap(toUpsert, (doc) => [
+      { update: { _index: doc.index, _id: doc.id, _type: doc.type } },
+      { doc: doc.body, doc_as_upsert: true }
+    ])
+
+    await es.bulk({ refresh: true, body: updateBody })
   }
 }
