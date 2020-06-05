@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk')
+const flatMap = require('lodash.flatmap')
 const converter = AWS.DynamoDB.Converter.unmarshall
 const elastic = require('./utils/es-wrapper')
 const getTableNameFromARN = require('./utils/table-name-from-arn')
@@ -20,8 +21,9 @@ exports.pushStream = async (
     index = getTableNameFromARN(event.Records[0].eventSourceARN),
     type = getTableNameFromARN(event.Records[0].eventSourceARN),
     endpoint,
-    refresh = true,
+    refresh = false,
     testMode = false,
+    useBulk = false,
     transformFunction = undefined,
     elasticSearchOptions
   } = {}) => {
@@ -29,9 +31,13 @@ exports.pushStream = async (
   validateString(type, 'type')
   validateString(endpoint, 'endpoint')
   validateBoolean(refresh, 'refresh')
+  validateBoolean(useBulk, 'useBulk')
   validateFunctionOrUndefined(transformFunction, 'transformFunction')
 
   const es = await elastic(endpoint, testMode, elasticSearchOptions)
+
+  const toRemove = []
+  const toUpsert = []
 
   for (const record of event.Records) {
     const keys = converter(record.dynamodb.Keys)
@@ -39,13 +45,7 @@ exports.pushStream = async (
 
     switch (record.eventName) {
       case 'REMOVE': {
-        try {
-          if ((await es.exists({ index, type, id, refresh })).body) {
-            await es.remove({ index, type, id, refresh })
-          }
-        } catch (e) {
-          throw new Error(e)
-        }
+        toRemove.push({ index, type, id, refresh })
         break
       }
       case 'MODIFY':
@@ -61,7 +61,7 @@ exports.pushStream = async (
             body &&
             (Object.keys(body).length !== 0 && body.constructor === Object)
           ) {
-            await es.index({ index, type, id, body, refresh })
+            toUpsert.push({ index, type, id, body, refresh })
           }
         } catch (e) {
           throw new Error(e)
@@ -70,6 +70,36 @@ exports.pushStream = async (
       }
       default:
         throw new Error(record.eventName + ' wasn\'t recognized')
+    }
+  }
+
+  if (toRemove.length > 0) {
+    if (useBulk === true) {
+      const bodyDelete = flatMap(toRemove, (doc) => [{ delete: { _index: doc.index, _id: doc.id } }])
+      await es.bulk({ refresh: toRemove[0].refresh, body: bodyDelete })
+    } else {
+      for (const doc of toRemove) {
+        const { index, type, id, refresh } = doc
+        const { body: exists } = await es.exists({ index, type, id, refresh })
+        if (exists) {
+          await es.remove({ index, type, id, refresh })
+        }
+      }
+    }
+  }
+
+  if (toUpsert.length > 0) {
+    if (useBulk === true) {
+      const updateBody = flatMap(toUpsert, (doc) => [
+        { update: { _index: doc.index, _id: doc.id, _type: doc.type } },
+        { doc: doc.body, doc_as_upsert: true }
+      ])
+      await es.bulk({ toUpsert: toUpsert[0].refresh, body: updateBody })
+    } else {
+      for (const doc of toUpsert) {
+        const { index, type, id, body, refresh } = doc
+        await es.index({ index, type, id, body, refresh })
+      }
     }
   }
 }
