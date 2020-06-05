@@ -21,8 +21,9 @@ exports.pushStream = async (
     index = getTableNameFromARN(event.Records[0].eventSourceARN),
     type = getTableNameFromARN(event.Records[0].eventSourceARN),
     endpoint,
-    refresh = true,
+    refresh = false,
     testMode = false,
+    useBulk = false,
     transformFunction = undefined,
     elasticSearchOptions
   } = {}) => {
@@ -30,6 +31,7 @@ exports.pushStream = async (
   validateString(type, 'type')
   validateString(endpoint, 'endpoint')
   validateBoolean(refresh, 'refresh')
+  validateBoolean(useBulk, 'useBulk')
   validateFunctionOrUndefined(transformFunction, 'transformFunction')
 
   const es = await elastic(endpoint, testMode, elasticSearchOptions)
@@ -72,16 +74,32 @@ exports.pushStream = async (
   }
 
   if (toRemove.length > 0) {
-    const bodyDelete = flatMap(toRemove, (doc) => [{ delete: { _index: doc.index, _id: doc.id } }])
-    await es.bulk({ refresh: true, body: bodyDelete })
+    if (useBulk === true) {
+      const bodyDelete = flatMap(toRemove, (doc) => [{ delete: { _index: doc.index, _id: doc.id } }])
+      await es.bulk({ refresh: toRemove[0].refresh, body: bodyDelete })
+    } else {
+      for (const doc of toRemove) {
+        const { index, type, id, refresh } = doc
+        const { body: exists } = await es.exists({ index, type, id, refresh })
+        if (exists) {
+          await es.remove({ index, type, id, refresh })
+        }
+      }
+    }
   }
 
   if (toUpsert.length > 0) {
-    const updateBody = flatMap(toUpsert, (doc) => [
-      { update: { _index: doc.index, _id: doc.id, _type: doc.type } },
-      { doc: doc.body, doc_as_upsert: true }
-    ])
-
-    await es.bulk({ refresh: true, body: updateBody })
+    if (useBulk === true) {
+      const updateBody = flatMap(toUpsert, (doc) => [
+        { update: { _index: doc.index, _id: doc.id, _type: doc.type } },
+        { doc: doc.body, doc_as_upsert: true }
+      ])
+      await es.bulk({ toUpsert: toUpsert[0].refresh, body: updateBody })
+    } else {
+      for (const doc of toUpsert) {
+        const { index, type, id, body, refresh } = doc
+        await es.index({ index, type, id, body, refresh })
+      }
+    }
   }
 }
