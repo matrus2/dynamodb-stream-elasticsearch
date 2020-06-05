@@ -204,6 +204,26 @@ describe('Test stream events', () => {
     assert.deepEqual(data, body._source)
   })
 
+  it('Multiple events: insert, remove, modify using bulk option', async () => {
+    await pushStream({ event: multipleEvents, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, useBulk: true, testMode: true })
+    const removed = converter(multipleEvents.Records[2].dynamodb.Keys).url
+    const inserted = converter(multipleEvents.Records[0].dynamodb.Keys).url
+    const changed = converter(multipleEvents.Records[1].dynamodb.Keys).url
+    // REMOVED
+    let result = await fetch(`${ES_ENDPOINT}/${INDEX}/${TYPE}/${removed}`)
+    let body = await result.json()
+    assert.isFalse(body.found)
+    // INSERTED
+    result = await fetch(`${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`)
+    body = await result.json()
+    assert.isTrue(body.found)
+    // CHANGED
+    result = await fetch(`${ES_ENDPOINT}/${INDEX}/${TYPE}/${changed}`)
+    body = await result.json()
+    const data = removeEventData(converter(multipleEvents.Records[1].dynamodb.NewImage))
+    assert.deepEqual(data, body._source)
+  })
+
   it('Multiple events: insert, remove, modify with refresh false', async () => {
     await pushStream({
       event: multipleEvents,
@@ -212,6 +232,34 @@ describe('Test stream events', () => {
       endpoint: ES_ENDPOINT,
       testMode: true,
       refresh: false
+    })
+    const removed = converter(multipleEvents.Records[2].dynamodb.Keys).url
+    const inserted = converter(multipleEvents.Records[0].dynamodb.Keys).url
+    const changed = converter(multipleEvents.Records[1].dynamodb.Keys).url
+    // REMOVED
+    let result = await fetch(`${ES_ENDPOINT}/${INDEX}/${TYPE}/${removed}`)
+    let body = await result.json()
+    assert.isFalse(body.found)
+    // INSERTED
+    result = await fetch(`${ES_ENDPOINT}/${INDEX}/${TYPE}/${inserted}`)
+    body = await result.json()
+    assert.isTrue(body.found)
+    // CHANGED
+    result = await fetch(`${ES_ENDPOINT}/${INDEX}/${TYPE}/${changed}`)
+    body = await result.json()
+    const data = removeEventData(converter(multipleEvents.Records[1].dynamodb.NewImage))
+    assert.deepEqual(data, body._source)
+  })
+
+  it('Multiple events: insert, remove, modify with refresh false using bulk', async () => {
+    await pushStream({
+      event: multipleEvents,
+      index: INDEX,
+      type: TYPE,
+      endpoint: ES_ENDPOINT,
+      testMode: true,
+      refresh: false,
+      useBulk: true
     })
     const removed = converter(multipleEvents.Records[2].dynamodb.Keys).url
     const inserted = converter(multipleEvents.Records[0].dynamodb.Keys).url
