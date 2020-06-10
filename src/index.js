@@ -21,7 +21,7 @@ exports.pushStream = async (
     index = getTableNameFromARN(event.Records[0].eventSourceARN),
     type = getTableNameFromARN(event.Records[0].eventSourceARN),
     endpoint,
-    refresh = false,
+    refresh = true,
     testMode = false,
     useBulk = false,
     transformFunction = undefined,
