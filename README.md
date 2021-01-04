@@ -76,7 +76,7 @@ The tag ```latest`` does not exists, therefore a specific version needs to be sp
 To run tests locally you need to have an Elasticsearch Docker container running. Simply type:
 
 ```bash
-docker run -i -p 9200:9200 --name my_elastic -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.2.0
+docker run -i -p 9200:9200 --name my_elastic_7_10 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.10.1
 ```   
 ### Running tests
 
