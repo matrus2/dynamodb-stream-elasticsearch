@@ -270,10 +270,96 @@ const sampleData = [{
   name: 'ben wright'
 }]
 
+const insertEventWithInconsitentTypes = {
+  Records: [
+    {
+      eventID: 'f41d65c5ba9a67153994d2122275b05g',
+      eventName: 'INSERT',
+      eventVersion: '1.1',
+      eventSource: 'aws:dynamodb',
+      awsRegion: 'us-east-1',
+      dynamodb: {
+        ApproximateCreationDateTime: 1521459420,
+        Keys: {
+          url: {
+            S: 'kale-pasros-253b536b-1'
+          }
+        },
+        NewImage: {
+          country: {
+            S: 'US'
+          },
+          addedDate: {
+            N: '1518103840119'
+          },
+          city: {
+            S: 'New Shann'
+          },
+          company_id: {
+            N: '1'
+          },
+          url: {
+            S: 'kale-pasros-253b536b-1'
+          },
+          name: {
+            S: 'kale pouros'
+          }
+        },
+        SequenceNumber: '214656100000000005192507033',
+        SizeBytes: 16430,
+        StreamViewType: 'NEW_IMAGE'
+      },
+      eventSourceARN:
+        'arn:aws:dynamodb:us-east-1:945413996076:table/Candidates/stream/2018-02-26T13:30:22.250'
+    },
+    {
+      eventID: 'f41d65c5ba9a67153994d2122275b05h',
+      eventName: 'INSERT',
+      eventVersion: '1.1',
+      eventSource: 'aws:dynamodb',
+      awsRegion: 'us-east-1',
+      dynamodb: {
+        ApproximateCreationDateTime: 1521459420,
+        Keys: {
+          url: {
+            S: 'kale-pasros-253b536b-1'
+          }
+        },
+        NewImage: {
+          country: {
+            N: '0'
+          },
+          addedDate: {
+            S: 'undefined'
+          },
+          city: {
+            N: '0'
+          },
+          company_id: {
+            S: 'undefined'
+          },
+          url: {
+            N: '0'
+          },
+          name: {
+            N: '0'
+          }
+        },
+        SequenceNumber: '214656100000000005192507034',
+        SizeBytes: 16430,
+        StreamViewType: 'NEW_IMAGE'
+      },
+      eventSourceARN:
+        'arn:aws:dynamodb:us-east-1:945413996076:table/Candidates/stream/2018-02-26T13:30:22.250'
+    }
+  ]
+}
+
 module.exports = {
   modifyEvent,
   removeEvent,
   insertEvent,
   multipleEvents,
-  sampleData
+  sampleData,
+  insertEventWithInconsitentTypes
 }

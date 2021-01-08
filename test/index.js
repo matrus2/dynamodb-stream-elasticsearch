@@ -4,7 +4,7 @@ const fetch = require('node-fetch')
 const AWS = require('aws-sdk')
 const { pushStream } = require('./../src/index')
 const elastic = require('../src/utils/es-wrapper')
-const { sampleData, modifyEvent, removeEvent, insertEvent, multipleEvents } = require('./fixtures')
+const { sampleData, modifyEvent, removeEvent, insertEvent, multipleEvents, insertEventWithInconsitentTypes } = require('./fixtures')
 const { removeEventData } = require('../src/utils/index')
 const getTableNameFromARN = require('../src/utils/table-name-from-arn')
 
@@ -222,6 +222,14 @@ describe('Test stream events', () => {
     body = await result.json()
     const data = removeEventData(converter(multipleEvents.Records[1].dynamodb.NewImage))
     assert.deepEqual(data, body._source)
+  })
+
+  it('Throws errors when index not found when using bulk delete', async () => {
+    await assertThrowsAsync(async () => pushStream({ event: removeEvent, index: 'test-no-exists', type: 'test-type-no-exists', endpoint: ES_ENDPOINT, useBulk: true, testMode: true }), 'An error occured while executing a batch delete, please set DEBUG=elasticsearch for details')
+  })
+
+  it('Throws errors when index not found when using bulk insert with inconsistent document types', async () => {
+    await assertThrowsAsync(async () => pushStream({ event: insertEventWithInconsitentTypes, index: INDEX, type: TYPE, endpoint: ES_ENDPOINT, useBulk: true, testMode: true }), 'An error occured while executing a batch upsert, please set DEBUG=elasticsearch for details')
   })
 
   it('Multiple events: insert, remove, modify with refresh false', async () => {

@@ -76,7 +76,10 @@ exports.pushStream = async (
   if (toRemove.length > 0) {
     if (useBulk === true) {
       const bodyDelete = flatMap(toRemove, (doc) => [{ delete: { _index: doc.index, _id: doc.id } }])
-      await es.bulk({ refresh: toRemove[0].refresh, body: bodyDelete })
+      const { body: bulkResponse } = await es.bulk({ refresh: toRemove[0].refresh, body: bodyDelete })
+      if (bulkResponse.errors) {
+        throw new Error('An error occured while executing a batch delete, please set DEBUG=elasticsearch for details')
+      }
     } else {
       for (const doc of toRemove) {
         const { index, type, id, refresh } = doc
@@ -94,7 +97,10 @@ exports.pushStream = async (
         { update: { _index: doc.index, _id: doc.id, _type: doc.type } },
         { doc: doc.body, doc_as_upsert: true }
       ])
-      await es.bulk({ toUpsert: toUpsert[0].refresh, body: updateBody })
+      const { body: bulkResponse } = await es.bulk({ toUpsert: toUpsert[0].refresh, body: updateBody })
+      if (bulkResponse.errors) {
+        throw new Error('An error occured while executing a batch upsert, please set DEBUG=elasticsearch for details')
+      }
     } else {
       for (const doc of toUpsert) {
         const { index, type, id, body, refresh } = doc
