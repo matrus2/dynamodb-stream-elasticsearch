@@ -19,7 +19,6 @@ exports.pushStream = async (
   {
     event,
     index = getTableNameFromARN(event.Records[0].eventSourceARN),
-    type = getTableNameFromARN(event.Records[0].eventSourceARN),
     endpoint,
     refresh = true,
     testMode = false,
@@ -28,7 +27,6 @@ exports.pushStream = async (
     elasticSearchOptions
   } = {}) => {
   validateString(index, 'index')
-  validateString(type, 'type')
   validateString(endpoint, 'endpoint')
   validateBoolean(refresh, 'refresh')
   validateBoolean(useBulk, 'useBulk')
@@ -45,7 +43,7 @@ exports.pushStream = async (
 
     switch (record.eventName) {
       case 'REMOVE': {
-        toRemove.push({ index, type, id, refresh })
+        toRemove.push({ index, id, refresh })
         break
       }
       case 'MODIFY':
@@ -61,7 +59,7 @@ exports.pushStream = async (
             body &&
             (Object.keys(body).length !== 0 && body.constructor === Object)
           ) {
-            toUpsert.push({ index, type, id, body, refresh })
+            toUpsert.push({ index, id, body, refresh })
           }
         } catch (e) {
           throw new Error(e)
@@ -82,10 +80,10 @@ exports.pushStream = async (
       }
     } else {
       for (const doc of toRemove) {
-        const { index, type, id, refresh } = doc
-        const { body: exists } = await es.exists({ index, type, id, refresh })
+        const { index, id, refresh } = doc
+        const { body: exists } = await es.exists({ index, id, refresh })
         if (exists) {
-          await es.remove({ index, type, id, refresh })
+          await es.remove({ index, id, refresh })
         }
       }
     }
@@ -94,7 +92,7 @@ exports.pushStream = async (
   if (toUpsert.length > 0) {
     if (useBulk === true) {
       const updateBody = flatMap(toUpsert, (doc) => [
-        { update: { _index: doc.index, _id: doc.id, _type: doc.type } },
+        { update: { _index: doc.index, _id: doc.id } },
         { doc: doc.body, doc_as_upsert: true }
       ])
       const { body: bulkResponse } = await es.bulk({ toUpsert: toUpsert[0].refresh, body: updateBody })
@@ -103,8 +101,8 @@ exports.pushStream = async (
       }
     } else {
       for (const doc of toUpsert) {
-        const { index, type, id, body, refresh } = doc
-        await es.index({ index, type, id, body, refresh })
+        const { index, id, body, refresh } = doc
+        await es.index({ index, id, body, refresh })
       }
     }
   }
