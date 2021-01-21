@@ -80,7 +80,7 @@ describe('Test stream events', () => {
     await pushStream({
       event: insertEvent,
       index: INDEX,
-    
+
       endpoint: ES_ENDPOINT,
       refresh: false,
       testMode: true
@@ -108,7 +108,7 @@ describe('Test stream events', () => {
     await pushStream({
       event: insertEvent,
       index: INDEX,
-    
+
       endpoint: ES_ENDPOINT,
       testMode: true,
       transformFunction: insertFullAddress
@@ -124,7 +124,7 @@ describe('Test stream events', () => {
     await pushStream({
       event: insertEvent,
       index: INDEX,
-    
+
       endpoint: ES_ENDPOINT,
       testMode: true,
       transformFunction: transformPromise(true)
@@ -141,7 +141,7 @@ describe('Test stream events', () => {
     await pushStream({
       event: insertEvent,
       index: INDEX,
-    
+
       endpoint: ES_ENDPOINT,
       testMode: true,
       transformFunction: transformPromiseTimeout(true)
@@ -158,7 +158,7 @@ describe('Test stream events', () => {
     const simpleData = {
       event: insertEvent,
       index: INDEX,
-    
+
       endpoint: ES_ENDPOINT,
       testMode: true,
       transformFunction: transformPromise(false)
@@ -170,7 +170,7 @@ describe('Test stream events', () => {
     await pushStream({
       event: insertEvent,
       index: INDEX,
-    
+
       endpoint: ES_ENDPOINT,
       testMode: true,
       transformFunction: undefined
@@ -235,7 +235,7 @@ describe('Test stream events', () => {
     await pushStream({
       event: multipleEvents,
       index: INDEX,
-    
+
       endpoint: ES_ENDPOINT,
       testMode: true,
       refresh: false
@@ -262,7 +262,7 @@ describe('Test stream events', () => {
     await pushStream({
       event: multipleEvents,
       index: INDEX,
-    
+
       endpoint: ES_ENDPOINT,
       testMode: true,
       refresh: false,
@@ -336,7 +336,7 @@ describe('Test stream events', () => {
     await pushStream({
       event: insertEvent,
       index: INDEX,
-    
+
       endpoint: ES_ENDPOINT,
       transformFunction: (body) => false,
       testMode: true
@@ -351,7 +351,7 @@ describe('Test stream events', () => {
     await pushStream({
       event: insertEvent,
       index: INDEX,
-    
+
       endpoint: ES_ENDPOINT,
       transformFunction: body => {},
       testMode: true
@@ -366,7 +366,7 @@ describe('Test stream events', () => {
     await pushStream({
       event: modifyEvent,
       index: INDEX,
-    
+
       endpoint: ES_ENDPOINT,
       transformFunction: (body, oldBody) => {
         const { city } = oldBody
@@ -393,7 +393,7 @@ describe('Test stream events', () => {
     await pushStream({
       event: modifyEvent,
       index: INDEX,
-    
+
       endpoint: ES_ENDPOINT,
       transformFunction: (body, oldBody, record) => {
         const dynamoDbJSON = record.dynamodb.NewImage
@@ -409,7 +409,7 @@ describe('Test stream events', () => {
     await pushStream({
       event: insertEvent,
       index: INDEX,
-    
+
       endpoint: 'tobeoverwritten',
       testMode: true,
       transformFunction: undefined,
