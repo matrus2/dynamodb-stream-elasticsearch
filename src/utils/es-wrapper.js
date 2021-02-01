@@ -18,9 +18,9 @@ module.exports = async (node, testMode, options) => {
   })
 
   return {
-    index: ({ index, type, id, body, refresh }) => es.index({ index, type, id, body, refresh, timeout: '5m' }),
-    remove: ({ index, type, id, refresh }) => es.delete({ index, type, id, refresh }),
-    exists: ({ index, type, id, refresh }) => es.exists({ index, type, id, refresh }),
+    index: ({ index, id, body, refresh }) => es.index({ index, id, body, refresh, timeout: '5m' }),
+    remove: ({ index, id, refresh }) => es.delete({ index, id, refresh }),
+    exists: ({ index, id, refresh }) => es.exists({ index, id, refresh }),
     indicesDelete: (index = '_all') => es.indices.delete({ index }),
     bulk: ({ refresh = true, body }) => es.bulk({ refresh, body })
   }
