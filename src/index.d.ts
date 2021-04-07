@@ -13,5 +13,6 @@ export interface streamOptions {
     refresh?: boolean,
     testMode?: boolean,
     transformFunction?: transformFunction,
-    elasticSearchOptions?: ClientOptions
+    elasticSearchOptions?: ClientOptions,
+    useBulk?: boolean
 }
