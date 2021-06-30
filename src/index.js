@@ -95,7 +95,7 @@ exports.pushStream = async (
         { update: { _index: doc.index, _id: doc.id } },
         { doc: doc.body, doc_as_upsert: true }
       ])
-      const { body: bulkResponse } = await es.bulk({ toUpsert: toUpsert[0].refresh, body: updateBody })
+      const { body: bulkResponse } = await es.bulk({ refresh: toUpsert[0].refresh, body: updateBody })
       if (bulkResponse.errors) {
         throw new Error('An error occured while executing a batch upsert, please set DEBUG=elasticsearch for details')
       }
