@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.9'
 
 services:
   elasticsearch:
@@ -10,9 +10,9 @@ services:
       - cluster.name=es-docker-cluster
       - discovery.type=single-node
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
     ports:
-      - "9200:9200"
+      - '9200:9200'
     ulimits:
       memlock:
         soft: -1
@@ -21,13 +21,13 @@ services:
       - data01:/usr/share/elasticsearch/data
 
   localstack:
-    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
-    image: localstack/localstack:latest
+    container_name: '${LOCALSTACK_DOCKER_NAME-localstack_main}'
+    image: localstack/localstack-full:latest
     network_mode: bridge
     ports:
-      - "4566:4566"
-      - "4571:4571"
-      - "${PORT_WEB_UI-8080}:${PORT_WEB_UI-8080}"
+      - '4566:4566'
+      - '4571:4571'
+      - '${PORT_WEB_UI-8080}:${PORT_WEB_UI-8080}'
     depends_on:
       - elasticsearch
     environment:
@@ -41,8 +41,8 @@ services:
       - DOCKER_HOST=unix:///var/run/docker.sock
       - HOST_TMP_FOLDER=${TMPDIR}
     volumes:
-      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - '${TMPDIR:-/tmp/localstack}:/tmp/localstack'
+      - '/var/run/docker.sock:/var/run/docker.sock'
     links:
       - elasticsearch
 

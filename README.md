@@ -82,13 +82,20 @@ Tests are written using Mocha [https://mochajs.org/]. Tests can be launched usin
 npm test
 ```
 
-If you modify ```src/utils/aws-es-connection``` please run 
+If you modify ```src/utils/aws-es-connection``` you will have to setup localstack on your local machine
+
+You will need to: 
+- start localstack locally with docker
+- install localstack via pip
+- configure a new elastic-search domain (and wait for it to be available)
+- run the tests
 
 ```bash
-npm test-aws 
+docker-compose up -d
+pip install awscli-local
+aws --endpoint-url http://localhost:4566 es create-elasticsearch-domain --domain-name domain-test
+AWS_ES_ENDPOINT=http://localhost:4571 npm test-aws 
 ```
-
-you will need to set the environment variable ```AWS_ES_ENDPOINT``` to a real AWS ElasticSearch Cluster instance 
 
 ### Contributing
 

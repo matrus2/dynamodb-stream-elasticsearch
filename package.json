@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "DEBUG=elasticsearch mocha test/index.js --timeout 10000",
-    "test-aws": "AWS_ES_ENDPOINT=http://localhost:4571 mocha test/aws-es-connection.js --timeout 10000",
+    "test-aws": "DEBUG=elasticsearch mocha test/aws-es-connection.js --timeout 10000",
     "lint": "./node_modules/.bin/eslint .",
     "publish:patch": "npm version patch && npm publish",
     "publish:minor": "npm version minor && npm publish",
