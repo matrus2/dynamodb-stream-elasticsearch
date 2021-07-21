@@ -97,6 +97,9 @@ aws --endpoint-url http://localhost:4566 es create-elasticsearch-domain --domain
 AWS_ES_ENDPOINT=http://localhost:4571 npm test-aws 
 ```
 
+One Note: there seem to be problems running localstack on macs M1, to check if the cluster has been created run:
+```awslocal es describe-elasticsearch-domain --domain-name domain-test | grep Created```
+
 ### Contributing
 
 If you want to commit changes, make sure if follow these rules:
