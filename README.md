@@ -82,6 +82,14 @@ Tests are written using Mocha [https://mochajs.org/]. Tests can be launched usin
 npm test
 ```
 
+If you modify ```src/utils/aws-es-connection``` please run 
+
+```bash
+npm test-aws 
+```
+
+you will need to set the environment variable ```AWS_ES_ENDPOINT``` to a real AWS ElasticSearch Cluster instance 
+
 ### Contributing
 
 If you want to commit changes, make sure if follow these rules:

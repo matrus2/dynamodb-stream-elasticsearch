@@ -1,5 +1,5 @@
 const { Client } = require('@elastic/elasticsearch')
-const { createAWSConnection, awsGetCredentials } = require('@acuris/aws-es-connection')
+const { createAWSConnection, awsGetCredentials } = require('./aws-es-connection')
 
 module.exports = async (node, testMode, options) => {
   const esParams = { node }
