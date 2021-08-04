@@ -69,12 +69,10 @@ Upload Lambda to AWS and _star_ this repository if it works as expected!!
 ### Setup elastic node 
 Docker can be used to host a node of Elasticsearch
 
-Docker by default tries to pull the ```elasticsearch:latest``` tag from the repository if no version is specified. 
-The tag ```latest`` does not exists, therefore a specific version needs to be specified ie: ```7.2.0```.
 To run tests locally you need to have an Elasticsearch Docker container running. Simply type:
 
 ```bash
-docker run -i -p 9200:9200 --name my_elastic_7_10 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+docker-compose up -d 
 ```   
 ### Running tests
 
@@ -83,6 +81,24 @@ Tests are written using Mocha [https://mochajs.org/]. Tests can be launched usin
 ```bash
 npm test
 ```
+
+If you modify ```src/utils/aws-es-connection``` you will have to setup localstack on your local machine
+
+You will need to: 
+- start localstack locally with docker
+- install localstack via pip
+- configure a new elastic-search domain (and wait for it to be available)
+- run the tests
+
+```bash
+docker-compose up -d
+pip install awscli-local
+aws --endpoint-url http://localhost:4566 es create-elasticsearch-domain --domain-name domain-test
+AWS_ES_ENDPOINT=http://localhost:4571 npm test-aws 
+```
+
+One Note: there seem to be problems running localstack on macs M1, to check if the cluster has been created run:
+```awslocal es describe-elasticsearch-domain --domain-name domain-test | grep Created```
 
 ### Contributing
 
