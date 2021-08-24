@@ -1,18 +1,24 @@
 language: node_js
+python:
+  - "3.8"
 node_js:
   - 10
 before_script:
   - sleep 20
-cache: npm
+cache:
+  - npm
+  - pip
 script:
   - npm run lint
   - npm run test
+  - npm run test-aws
+services:
+  - docker
 before_install:
-  - curl -s -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.7.1-amd64.deb
-  - sudo dpkg -i --force-confnew elasticsearch-7.7.1-amd64.deb
-  - sudo sed -i.old 's/-Xms1g/-Xms128m/' /etc/elasticsearch/jvm.options
-  - sudo sed -i.old 's/-Xmx1g/-Xmx128m/' /etc/elasticsearch/jvm.options
-  - echo -e '-XX:+DisableExplicitGC\n-Djdk.io.permissionsUseCanonicalPath=true\n-Dlog4j.skipJansi=true\n-server\n' | sudo tee -a /etc/elasticsearch/jvm.options
-  - sudo chown -R elasticsearch:elasticsearch /etc/default/elasticsearch
-  - sudo systemctl start elasticsearch
-  - sleep 10
+  - docker-compose up
+  - pip install -U pip
+  - pip install awscli-local
+  - export AWS_DEFAULT_REGION=us-east-2
+  - export AWS_ACCESS_KEY_ID=a
+  - export AWS_SECRET_ACCESS_KEY=a
+  - aws --endpoint-url http://localhost:4566 es create-elasticsearch-domain --domain-name domain-test
