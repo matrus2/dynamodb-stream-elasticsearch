@@ -1,16 +1,16 @@
 language: node_js
 env:
   - DOCKER_COMPOSE_VERSION=1.29.0
-python:
-  - "3.8"
 node_js:
-  - 10
-before_script:
-  - sleep 20
+  - 14
 cache:
   - npm
-  - pip
+  - docker
+before script:
+  - sleep 30
 script:
+  - curl http://localhost:9200
+  - curl http://localhost:4566
   - npm run lint
   - npm run test
   - npm run test-aws
@@ -22,9 +22,14 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - docker-compose up -d
-  - pip install -U pip
-  - pip install awscli-local
+  - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  - unzip awscliv2.zip
+  - sudo ./aws/install
   - export AWS_DEFAULT_REGION=us-east-2
   - export AWS_ACCESS_KEY_ID=a
   - export AWS_SECRET_ACCESS_KEY=a
-  - awslocal --endpoint-url http://localhost:4566 es create-elasticsearch-domain --domain-name domain-test
+  - export LOCALSTACK_HOST=localhost:4566
+  - docker ps
+  - sleep 20
+  - aws --endpoint-url http://localhost:4566 es create-elasticsearch-domain --domain-name domain-test > out.txt
+  - cat out.txt

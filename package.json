@@ -47,13 +47,16 @@
     "mocha": "^9.0.2",
     "node-fetch": "^2.6.1",
     "prettier": "^2.3.2",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "aws-sdk": "2.*.*"
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.13.0",
-    "aws-sdk": "2.950.0",
     "aws4": "1.11.0",
     "lodash.flatmap": "4.5.0"
+  },
+  "peerDependencies": {
+    "aws-sdk": "2.*.*"
   },
   "typings": "./src/index.d.ts"
 }
