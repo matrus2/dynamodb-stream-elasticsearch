@@ -11,7 +11,6 @@ export interface streamOptions {
     type?: string,
     endpoint: string,
     refresh?: boolean,
-    testMode?: boolean,
     transformFunction?: transformFunction,
     elasticSearchOptions?: ClientOptions,
     useBulk?: boolean

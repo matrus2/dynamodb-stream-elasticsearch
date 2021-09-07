@@ -3,3 +3,7 @@ test
 .eslintrc
 .gitignore
 package-lock.json
+.git-commit-template.txt
+.travis.yml
+.docker-compose.yml
+.prettierrc.js

@@ -1,18 +1,35 @@
 language: node_js
+env:
+  - DOCKER_COMPOSE_VERSION=1.29.0
 node_js:
-  - 10
-before_script:
-  - sleep 20
-cache: npm
+  - 14
+cache:
+  - npm
+  - docker
+before script:
+  - sleep 30
 script:
+  - curl http://localhost:9200
+  - curl http://localhost:4566
   - npm run lint
   - npm run test
+  - npm run test-aws
+services:
+  - docker
 before_install:
-  - curl -s -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.7.1-amd64.deb
-  - sudo dpkg -i --force-confnew elasticsearch-7.7.1-amd64.deb
-  - sudo sed -i.old 's/-Xms1g/-Xms128m/' /etc/elasticsearch/jvm.options
-  - sudo sed -i.old 's/-Xmx1g/-Xmx128m/' /etc/elasticsearch/jvm.options
-  - echo -e '-XX:+DisableExplicitGC\n-Djdk.io.permissionsUseCanonicalPath=true\n-Dlog4j.skipJansi=true\n-server\n' | sudo tee -a /etc/elasticsearch/jvm.options
-  - sudo chown -R elasticsearch:elasticsearch /etc/default/elasticsearch
-  - sudo systemctl start elasticsearch
-  - sleep 10
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - docker-compose up -d
+  - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  - unzip awscliv2.zip
+  - sudo ./aws/install
+  - export AWS_DEFAULT_REGION=us-east-2
+  - export AWS_ACCESS_KEY_ID=a
+  - export AWS_SECRET_ACCESS_KEY=a
+  - export LOCALSTACK_HOST=localhost:4566
+  - docker ps
+  - sleep 20
+  - aws --endpoint-url http://localhost:4566 es create-elasticsearch-domain --domain-name domain-test > out.txt
+  - cat out.txt

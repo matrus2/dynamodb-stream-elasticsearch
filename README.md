@@ -66,35 +66,22 @@ Upload Lambda to AWS and _star_ this repository if it works as expected!!
 
 ## Running the tests
 
-### Setup elastic node 
-Docker can be used to host a node of Elasticsearch
-
-To run tests locally you need to have an Elasticsearch Docker container running. Simply type:
+Tests are written using Mocha [https://mochajs.org/]. There are two sets of tests, one uses an elasticsearch instance and one uses localstack. To execute the former use:
 
 ```bash
 docker-compose up -d 
-```   
-### Running tests
-
-Tests are written using Mocha [https://mochajs.org/]. Tests can be launched using:
-
-```bash
 npm test
-```
+```   
 
-If you modify ```src/utils/aws-es-connection``` you will have to setup localstack on your local machine
-
-You will need to: 
-- start localstack locally with docker
-- install localstack via pip
-- configure a new elastic-search domain (and wait for it to be available)
-- run the tests
+The latter can be executed with additional setup in place. You will need to: 
 
 ```bash
 docker-compose up -d
+# Install aws cli and configure it
 pip install awscli-local
+aws configure
 aws --endpoint-url http://localhost:4566 es create-elasticsearch-domain --domain-name domain-test
-AWS_ES_ENDPOINT=http://localhost:4571 npm test-aws 
+npm run test-aws 
 ```
 
 One Note: there seem to be problems running localstack on macs M1, to check if the cluster has been created run:
@@ -107,13 +94,10 @@ If you want to commit changes, make sure if follow these rules:
 2. Code should follow [Javascript Standard Guideline](https://standardjs.com/);
 3. Commit messages should be set according to [this article](https://chris.beams.io/posts/git-commit/).
 
-#### TODO
-- Introduce Continuous Integration;
-- Add Elasticsearch bulk operation instead of index for multiple records
-
 ## Authors & Contributors
 
 * [matrus2](https://github.com/matrus2)
+* [aterreno](https://github.com/aterreno)
 * [cdelgadob](https://github.com/cdelgadob)
 
 ## License
