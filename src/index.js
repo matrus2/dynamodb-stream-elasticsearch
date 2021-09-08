@@ -110,8 +110,8 @@ exports.pushStream = async (
   if (toUpsert.length > 0) {
     if (useBulk === true) {
       const updateBody = flatMap(toUpsert, (doc) => [
-        { update: { _index: doc.index, _id: doc.id } },
-        { doc: doc.body, doc_as_upsert: true }
+        { index: { _index: doc.index, _id: doc.id } },
+        doc.body
       ])
       const { body: bulkResponse } = await es.bulk({ refresh: toUpsert[0].refresh, body: updateBody })
       if (bulkResponse.errors) {
