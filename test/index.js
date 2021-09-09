@@ -401,8 +401,17 @@ describe('Test stream events', () => {
     assert.deepEqual(data, body._source)
   })
 
-  it('MODIFY: should remove deleted fields', async () => {
+  it('MODIFY: non-bulk option should remove deleted fields', async () => {
     await pushStream({ event: modifyEventWithDeletedField, index: INDEX, endpoint: ES_ENDPOINT })
+    const keys = converter(modifyEventWithDeletedField.Records[0].dynamodb.Keys)
+    const result = await fetch(`${ES_ENDPOINT}/${INDEX}/_doc/${keys.url}`)
+    const body = await result.json()
+    const data = removeEventData(converter(modifyEventWithDeletedField.Records[0].dynamodb.NewImage))
+    assert.deepEqual(data, body._source)
+  })
+
+  it('MODIFY: bulk option should remove deleted fields', async () => {
+    await pushStream({ event: modifyEventWithDeletedField, index: INDEX, endpoint: ES_ENDPOINT, useBulk: true })
     const keys = converter(modifyEventWithDeletedField.Records[0].dynamodb.Keys)
     const result = await fetch(`${ES_ENDPOINT}/${INDEX}/_doc/${keys.url}`)
     const body = await result.json()
