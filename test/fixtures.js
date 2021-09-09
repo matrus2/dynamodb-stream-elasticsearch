@@ -66,6 +66,68 @@ const modifyEvent = {
   ]
 }
 
+const modifyEventWithDeletedField = {
+  Records: [
+    {
+      eventID: '89b9b96fe443b7f4869f46d773c9ef29',
+      eventName: 'MODIFY',
+      eventVersion: '1.1',
+      eventSource: 'aws:dynamodb',
+      awsRegion: 'us-east-1',
+      dynamodb: {
+        ApproximateCreationDateTime: 1521459360,
+        Keys: {
+          url: {
+            S: 'russ-wintheiser-c240e6ac-3'
+          }
+        },
+        NewImage: {
+          country: {
+            S: 'US'
+          },
+          addedDate: {
+            N: '1518102681654'
+          },
+          city: {
+            S: 'Aric view'
+          },
+          company_id: {
+            N: '3'
+          },
+          url: {
+            S: 'russ-wintheiser-c240e6ac-4'
+          }
+        },
+        OldImage: {
+          country: {
+            S: 'US'
+          },
+          addedDate: {
+            N: '1518102681654'
+          },
+          city: {
+            S: 'Arick view'
+          },
+          company_id: {
+            N: '3'
+          },
+          url: {
+            S: 'russ-wintheiser-c240e6ac-3'
+          },
+          name: {
+            S: 'russ wintheiser'
+          }
+        },
+        SequenceNumber: '214655900000000005192458861',
+        SizeBytes: 16438,
+        StreamViewType: 'NEW_AND_OLD_IMAGES'
+      },
+      eventSourceARN:
+        'arn:aws:dynamodb:us-east-1:945413996076:table/Candidates/stream/2018-02-26T13:30:22.250'
+    }
+  ]
+}
+
 /*
  REMOVE
 */
@@ -361,5 +423,6 @@ module.exports = {
   insertEvent,
   multipleEvents,
   sampleData,
-  insertEventWithInconsitentTypes
+  insertEventWithInconsitentTypes,
+  modifyEventWithDeletedField
 }

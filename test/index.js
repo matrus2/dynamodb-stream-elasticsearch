@@ -4,7 +4,7 @@ const fetch = require('node-fetch')
 const AWS = require('aws-sdk')
 const { pushStream } = require('./../src/index')
 const elastic = require('../src/utils/es-wrapper')
-const { sampleData, modifyEvent, removeEvent, insertEvent, multipleEvents, insertEventWithInconsitentTypes } = require('./fixtures')
+const { sampleData, modifyEvent, removeEvent, insertEvent, multipleEvents, insertEventWithInconsitentTypes, modifyEventWithDeletedField } = require('./fixtures')
 const { removeEventData } = require('../src/utils/index')
 const getTableNameFromARN = require('../src/utils/table-name-from-arn')
 
@@ -398,6 +398,24 @@ describe('Test stream events', () => {
     const body = await result.json()
     assert.isTrue(body.found)
     const data = removeEventData(converter(insertEvent.Records[0].dynamodb.NewImage))
+    assert.deepEqual(data, body._source)
+  })
+
+  it('MODIFY: non-bulk option should remove deleted fields', async () => {
+    await pushStream({ event: modifyEventWithDeletedField, index: INDEX, endpoint: ES_ENDPOINT })
+    const keys = converter(modifyEventWithDeletedField.Records[0].dynamodb.Keys)
+    const result = await fetch(`${ES_ENDPOINT}/${INDEX}/_doc/${keys.url}`)
+    const body = await result.json()
+    const data = removeEventData(converter(modifyEventWithDeletedField.Records[0].dynamodb.NewImage))
+    assert.deepEqual(data, body._source)
+  })
+
+  it('MODIFY: bulk option should remove deleted fields', async () => {
+    await pushStream({ event: modifyEventWithDeletedField, index: INDEX, endpoint: ES_ENDPOINT, useBulk: true })
+    const keys = converter(modifyEventWithDeletedField.Records[0].dynamodb.Keys)
+    const result = await fetch(`${ES_ENDPOINT}/${INDEX}/_doc/${keys.url}`)
+    const body = await result.json()
+    const data = removeEventData(converter(modifyEventWithDeletedField.Records[0].dynamodb.NewImage))
     assert.deepEqual(data, body._source)
   })
 })
