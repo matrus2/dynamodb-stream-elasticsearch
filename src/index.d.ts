@@ -1,12 +1,13 @@
 import { ClientOptions } from "@elastic/elasticsearch";
-import { RecordList, Record, AttributeMap } from "aws-sdk/clients/dynamodbstreams";
+import { DynamoDBStreamEvent, DynamoDBRecord  } from 'aws-lambda';
+import { AttributeMap } from "aws-sdk/clients/dynamodbstreams";
 
 export function pushStream(opts: streamOptions): Promise<void>
 
-export type transformFunction = (body?: { [key: string]: any }, oldBody?: AttributeMap, record?: Record) => Promise<any> | any
+export type transformFunction = (body?: { [key: string]: any }, oldBody?: AttributeMap, record?: DynamoDBRecord) => Promise<any> | any
 
 export interface streamOptions {
-    event: RecordList,
+    event: DynamoDBStreamEvent,
     index?: string,
     type?: string,
     endpoint: string,
