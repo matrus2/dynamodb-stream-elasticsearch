@@ -9,9 +9,9 @@
     "test-aws": "mocha test/aws-es-connection.js --timeout 10000",
     "test-aws-debug": "DEBUG=elasticsearch mocha test/aws-es-connection.js --timeout 10000",
     "lint": "./node_modules/.bin/eslint .",
-    "publish:patch": "npm version patch && npm publish",
-    "publish:minor": "npm version minor && npm publish",
-    "publish:major": "npm version major && npm publish"
+    "publish:patch": "npm version patch && npm publish && git push && git push --tags",
+    "publish:minor": "npm version minor && npm publish && git push && git push --tags",
+    "publish:major": "npm version major && npm publish && git push && git push --tags"
   },
   "repository": {
     "type": "git",
