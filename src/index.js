@@ -89,24 +89,6 @@ exports.pushStream = async (
     }
   }
 
-  if (toRemove.length > 0) {
-    if (useBulk === true) {
-      const bodyDelete = flatMap(toRemove, (doc) => [{ delete: { _index: doc.index, _id: doc.id } }])
-      const { body: bulkResponse } = await es.bulk({ refresh: toRemove[0].refresh, body: bodyDelete })
-      if (bulkResponse.errors) {
-        handleBulkResponseErrors(bulkResponse, bodyDelete)
-      }
-    } else {
-      for (const doc of toRemove) {
-        const { index, id, refresh } = doc
-        const { body: exists } = await es.exists({ index, id, refresh })
-        if (exists) {
-          await es.remove({ index, id, refresh })
-        }
-      }
-    }
-  }
-
   if (toUpsert.length > 0) {
     if (useBulk === true) {
       const updateBody = flatMap(toUpsert, (doc) => [
@@ -121,6 +103,24 @@ exports.pushStream = async (
       for (const doc of toUpsert) {
         const { index, id, body, refresh } = doc
         await es.index({ index, id, body, refresh })
+      }
+    }
+  }
+
+  if (toRemove.length > 0) {
+    if (useBulk === true) {
+      const bodyDelete = flatMap(toRemove, (doc) => [{ delete: { _index: doc.index, _id: doc.id } }])
+      const { body: bulkResponse } = await es.bulk({ refresh: toRemove[0].refresh, body: bodyDelete })
+      if (bulkResponse.errors) {
+        handleBulkResponseErrors(bulkResponse, bodyDelete)
+      }
+    } else {
+      for (const doc of toRemove) {
+        const { index, id, refresh } = doc
+        const { body: exists } = await es.exists({ index, id, refresh })
+        if (exists) {
+          await es.remove({ index, id, refresh })
+        }
       }
     }
   }
