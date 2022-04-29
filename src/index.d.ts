@@ -9,10 +9,9 @@ export type transformFunction = (body?: { [key: string]: any }, oldBody?: Attrib
 export interface streamOptions {
     event: DynamoDBStreamEvent,
     index?: string,
-    type?: string,
     endpoint: string,
     refresh?: boolean,
+    useBulk?: boolean
     transformFunction?: transformFunction,
     elasticSearchOptions?: ClientOptions,
-    useBulk?: boolean
 }
