@@ -41,6 +41,7 @@ exports.pushStream = async (
     endpoint,
     refresh = true,
     useBulk = false,
+    keepAlive = false,
     transformFunction = undefined,
     elasticSearchOptions
   } = {}) => {
@@ -48,9 +49,10 @@ exports.pushStream = async (
   validateString(endpoint, 'endpoint')
   validateBoolean(refresh, 'refresh')
   validateBoolean(useBulk, 'useBulk')
+  validateBoolean(keepAlive, 'keepAlive')
   validateFunctionOrUndefined(transformFunction, 'transformFunction')
 
-  const es = await elastic(endpoint, elasticSearchOptions)
+  const es = await elastic(endpoint, elasticSearchOptions, keepAlive)
 
   const toRemove = []
   const toUpsert = []

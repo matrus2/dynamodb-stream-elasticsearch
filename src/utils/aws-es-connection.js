@@ -1,9 +1,9 @@
 const { config } = require('aws-sdk/global')
-const { request } = require('http')
+const { request, Agent } = require('http')
 const { sign } = require('aws4')
 const { Connection, Transport } = require('@elastic/elasticsearch')
 
-function generateAWSConnectionClass (credentials) {
+function generateAWSConnectionClass (credentials, keepAlive) {
   return class AWSConnection extends Connection {
     constructor (opts) {
       super(opts)
@@ -11,7 +11,8 @@ function generateAWSConnectionClass (credentials) {
     }
 
     signedRequest (reqParams) {
-      return request(sign({ ...reqParams, service: 'es' }, credentials))
+      const httpAgent = new Agent({ keepAlive: keepAlive })
+      return request(sign({ ...reqParams, agent: httpAgent, service: 'es' }, credentials))
     }
   }
 }
@@ -48,8 +49,8 @@ function generateAWSTransportClass (credentials) {
   }
 }
 
-const createAWSConnection = awsCredentials => ({
-  Connection: generateAWSConnectionClass(awsCredentials),
+const createAWSConnection = (awsCredentials, keepAlive) => ({
+  Connection: generateAWSConnectionClass(awsCredentials, keepAlive),
   Transport: generateAWSTransportClass(awsCredentials)
 })
 
