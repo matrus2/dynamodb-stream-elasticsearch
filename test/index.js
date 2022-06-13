@@ -174,6 +174,20 @@ describe('Test stream events', () => {
     assert.deepEqual(data, body._source)
   })
 
+  it('Insert: should insert new item with keep alive', async () => {
+    await pushStream({
+      event: insertEvent,
+      index: INDEX,
+      endpoint: ES_ENDPOINT,
+      keepAlive: true
+    })
+    const inserted = converter(insertEvent.Records[0].dynamodb.Keys).url
+    // INSERTED
+    let result = await fetch(`${ES_ENDPOINT}/${INDEX}/_doc/${inserted}`)
+    let body = await result.json()
+    assert.isTrue(body.found)
+  })
+
   it('Multiple events: insert, remove, modify', async () => {
     await pushStream({ event: multipleEvents, index: INDEX, endpoint: ES_ENDPOINT })
     const removed = converter(multipleEvents.Records[2].dynamodb.Keys).url
