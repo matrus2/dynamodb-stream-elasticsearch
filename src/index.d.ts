@@ -33,6 +33,11 @@ export interface streamOptions {
      */
     useBulk?: boolean,
     /**
+     * Keep sockets around in a pool to be used by other requests in the future
+     * @default false
+     */
+    keepAlive?: boolean,
+    /**
      * A function/promise to transform each record before sending them to ES.
      * Applies to INSERT and UPDATE operations. If transformFunction returns an
      * empty object or false the row will be skipped. This function will receive
