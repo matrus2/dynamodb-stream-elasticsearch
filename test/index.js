@@ -183,8 +183,8 @@ describe('Test stream events', () => {
     })
     const inserted = converter(insertEvent.Records[0].dynamodb.Keys).url
     // INSERTED
-    let result = await fetch(`${ES_ENDPOINT}/${INDEX}/_doc/${inserted}`)
-    let body = await result.json()
+    const result = await fetch(`${ES_ENDPOINT}/${INDEX}/_doc/${inserted}`)
+    const body = await result.json()
     assert.isTrue(body.found)
   })
 
