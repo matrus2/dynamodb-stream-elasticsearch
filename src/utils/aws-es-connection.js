@@ -3,7 +3,7 @@ const { sign } = require('aws4')
 const { Connection, Transport } = require('@elastic/elasticsearch')
 
 function generateAWSConnectionClass (credentials, endpoint, keepAlive) {
-  const client = endpoint?.startsWith('https') ? require('https') : require('http')
+  const client = endpoint.startsWith('https') ? require('https') : require('http')
   const { request, Agent } = client
   return class AWSConnection extends Connection {
     constructor (opts) {
