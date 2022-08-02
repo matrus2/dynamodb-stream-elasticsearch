@@ -3,11 +3,10 @@ const { createAWSConnection, awsGetCredentials } = require('./aws-es-connection'
 
 module.exports = async (node, options, keepAlive) => {
   const esParams = { node }
-  let AWSConnection = {}
 
   const awsCredentials = await awsGetCredentials()
-  AWSConnection = createAWSConnection(awsCredentials, keepAlive)
-
+  const AWSConnection = createAWSConnection(awsCredentials, node, keepAlive)
+  
   const es = new Client({
     ...AWSConnection,
     ...esParams,
