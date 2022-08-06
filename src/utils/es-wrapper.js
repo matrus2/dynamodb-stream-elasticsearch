@@ -6,7 +6,7 @@ module.exports = async (node, options, keepAlive) => {
 
   const awsCredentials = await awsGetCredentials()
   const AWSConnection = createAWSConnection(awsCredentials, node, keepAlive)
-  
+
   const es = new Client({
     ...AWSConnection,
     ...esParams,
