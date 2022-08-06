@@ -28,7 +28,7 @@ describe('aws-es-connection', () => {
       throw new Error('Failed to make an call to the AWS API. Check your AWS credentials are set and valid.')
     }
 
-    const awsEsConnection = createAWSConnection(await awsGetCredentials())
+    const awsEsConnection = createAWSConnection(await awsGetCredentials(), esEndpoint, false)
     esClient = new Client({
       ...awsEsConnection,
       node: esEndpoint
