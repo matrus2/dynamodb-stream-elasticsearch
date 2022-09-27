@@ -102,9 +102,17 @@ exports.pushStream = async (
         handleBulkResponseErrors(bulkResponse, updateBody)
       }
     } else {
+      let error;
       for (const doc of toUpsert) {
         const { index, id, body, refresh } = doc
-        await es.index({ index, id, body, refresh })
+        try {
+          await es.index({ index, id, body, refresh })
+        } catch (e) {
+          error = e;
+        }
+      }
+      if(error){
+        throw error;
       }
     }
   }
@@ -117,12 +125,20 @@ exports.pushStream = async (
         handleBulkResponseErrors(bulkResponse, bodyDelete)
       }
     } else {
+      let error;
       for (const doc of toRemove) {
         const { index, id, refresh } = doc
         const { body: exists } = await es.exists({ index, id, refresh })
         if (exists) {
-          await es.remove({ index, id, refresh })
+          try {
+            await es.remove({ index, id, refresh })
+          } catch (e) {
+            error = e;
+          }
         }
+      }
+      if(error) {
+        throw error;
       }
     }
   }
